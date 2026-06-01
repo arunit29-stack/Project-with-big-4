@@ -1,0 +1,36 @@
+{
+  "name": "classroom-but-better",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@livekit/components-react": "^2.9.21",
+    "hls.js": "^1.6.2",
+    "idb": "^8.0.2",
+    "livekit-client": "^2.19.1",
+    "next": "^15.3.3",
+    "pdfjs-dist": "^4.8.69",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "react-pdf": "^9.2.1",
+    "socket.io-client": "^4.8.3",
+    "swr": "^2.3.3",
+    "tus-js-client": "^4.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.21",
+    "@types/react": "^19.1.4",
+    "@types/react-dom": "^19.1.5",
+    "autoprefixer": "^10.4.21",
+    "eslint": "^9.27.0",
+    "eslint-config-next": "^15.3.3",
+    "postcss": "^8.5.3",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^5.8.3"
+  }
+}

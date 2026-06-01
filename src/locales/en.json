@@ -1,0 +1,193 @@
+{
+  "platform": {
+    "name": "Classroom But Better"
+  },
+  "common": {
+    "cancel": "Cancel",
+    "save": "Save",
+    "close": "Close",
+    "loading": "Loading…",
+    "comingSoon": "Coming Soon",
+    "comingSoonTooltip": "This feature is coming in Phase 2"
+  },
+  "student": {
+    "classTitle": "My Classes",
+    "joinClass": "Join a Class",
+    "joinClassModalTitle": "Join a class",
+    "courseCodeLabel": "Course code",
+    "courseCodePlaceholder": "Enter code from your teacher",
+    "joinSubmit": "Join class",
+    "joinError": "No class found with that code. Please check with your teacher.",
+    "emptyTitle": "No courses yet",
+    "emptyDescription": "Join a class with a code from your teacher to get started.",
+    "emptyCta": "Join a Class",
+    "card": {
+      "teacher": "Teacher",
+      "code": "Code",
+      "dueSoon": "{{title}} — due {{date}}",
+      "recentContent": "New: {{title}}"
+    }
+  },
+  "teacher": {
+    "dashboardTitle": "My Courses",
+    "createCourse": "Create Course",
+    "createModalTitle": "Create a new course",
+    "courseNameLabel": "Course name",
+    "courseNamePlaceholder": "e.g. Biology 101",
+    "courseCodeLabel": "Course code",
+    "courseCodeHint": "Share this code with students to enrol",
+    "descriptionLabel": "Description",
+    "descriptionPlaceholder": "Brief course overview",
+    "enrolmentOpenLabel": "Enrolment open",
+    "enrolmentOpenHint": "Students can join with the course code",
+    "createSubmit": "Create course",
+    "emptyTitle": "No courses yet",
+    "emptyDescription": "Create your first course to start teaching.",
+    "emptyCta": "Create Course",
+    "card": {
+      "students": "{{count}} students",
+      "pendingSubmissions": "{{count}} to assess",
+      "upcomingQuiz": "Quiz soon",
+      "noUpcomingQuiz": "No quiz scheduled"
+    }
+  },
+  "courseShell": {
+    "notFound": "Course not found.",
+    "aiComingSoonTitle": "AI Assistant",
+    "aiComingSoonDescription": "Your course AI helper will be available in Phase 2.",
+    "tabs": {
+      "contentLibrary": "Content Library",
+      "assignments": "Assignments",
+      "quizzes": "Quizzes",
+      "liveSession": "Live Session",
+      "groupRooms": "Group Rooms",
+      "aiAssistant": "AI Assistant"
+    },
+    "empty": {
+      "contentTitle": "No content yet",
+      "contentDescription": "Upload materials to build your content library.",
+      "contentCta": "Add content",
+      "assignmentsTitle": "No assignments posted",
+      "assignmentsDescription": "Create an assignment for your students.",
+      "assignmentsCta": "Create assignment",
+      "quizzesTitle": "No quizzes yet",
+      "quizzesDescription": "Add a quiz to assess student learning.",
+      "quizzesCta": "Create quiz",
+      "liveTitle": "No live session",
+      "liveDescription": "Start a live session when you're ready to teach.",
+      "liveCta": "Schedule session",
+      "groupsTitle": "No group rooms",
+      "groupsDescription": "Set up collaborative group spaces for students.",
+      "groupsCta": "Create room"
+    }
+  },
+  "contentLibrary": {
+    "selectItem": "Select a file from the library to view it.",
+    "tree": {
+      "label": "Content library folders",
+      "empty": "No materials in this library."
+    },
+    "status": {
+      "uploading": "Uploading",
+      "processing": "Processing",
+      "ready": "Ready",
+      "failed": "Failed",
+      "retry": "Retry"
+    },
+    "pdf": {
+      "prevPage": "Previous page",
+      "nextPage": "Next page",
+      "pageOf": "{{page}} / {{total}}",
+      "zoomIn": "Zoom in",
+      "zoomOut": "Zoom out",
+      "fullscreen": "Full screen",
+      "download": "Download",
+      "highlight": "Highlight",
+      "addNote": "Add note",
+      "highlightHint": "Select text on the page, then save your highlight.",
+      "saveHighlight": "Save highlight",
+      "notePlaceholder": "Your note…",
+      "notReady": "This PDF is not ready to view yet."
+    },
+    "video": {
+      "play": "Play",
+      "pause": "Pause",
+      "seek": "Seek",
+      "volume": "Volume",
+      "speed": "Playback speed",
+      "fullscreen": "Full screen",
+      "notReady": "This video is not ready to play yet.",
+      "transcriptSearch": "Search transcript…",
+      "notePlaceholder": "Write a personal note…",
+      "saveNote": "Save note",
+      "notesAt": "Note at {{time}}",
+      "panel": {
+        "chapters": "Chapters",
+        "transcript": "Transcript",
+        "notes": "My notes"
+      }
+    },
+    "upload": {
+      "title": "Upload video",
+      "dropzone": "Drag and drop a video here, or click to browse",
+      "resuming": "Resuming upload…",
+      "progress": "Upload progress"
+    }
+  },
+  "assignments": {
+    "duePrefix": "Due",
+    "yourTime": "your time",
+    "backToList": "← Back to assignments",
+    "status": {
+      "not_submitted": "Not Submitted",
+      "submitted": "Submitted",
+      "submittedVersion": "Submitted (version {{version}})",
+      "late": "Late",
+      "pending_review": "Submitted",
+      "assessed": "Assessed"
+    },
+    "rubric": {
+      "title": "Rubric",
+      "criterion": "Criterion",
+      "descriptor": "Descriptor",
+      "maxMarks": "Max marks"
+    },
+    "submit": {
+      "title": "Submit your work",
+      "dropzone": "Drag and drop your PDF here, or click to browse",
+      "uploading": "Uploading…",
+      "progress": "Upload progress",
+      "pdfOnly": "Only PDF files are accepted."
+    },
+    "offline": {
+      "banner": "You're offline — your submission will be sent automatically when your connection returns.",
+      "syncing": "Uploading saved submission…"
+    },
+    "student": {
+      "deadlinePassed": "Deadline has passed",
+      "awaitingReview": "Your work has been received and is awaiting review.",
+      "resultsPending": "Results pending.",
+      "gradeTitle": "Your grade",
+      "historyTitle": "Submission history",
+      "version": "Version {{n}}"
+    },
+    "teacher": {
+      "pendingOnly": "Pending only",
+      "showAll": "Show all",
+      "noSubmissions": "No submissions match this filter.",
+      "submittedAt": "Submitted {{time}}",
+      "downloadPdf": "Download PDF",
+      "scoringTitle": "Rubric scoring",
+      "scoreFor": "Score for {{title}}",
+      "criterionComment": "Comment for this criterion…",
+      "overallFeedback": "Overall feedback",
+      "waiveLatePenalty": "Waive late penalty ({{percent}}%)",
+      "latePenaltyApplied": "A {{percent}}% late penalty will be applied to the total.",
+      "lateWithPenalty": "Late ({{percent}}% penalty)",
+      "markAssessed": "Mark as Assessed",
+      "alreadyAssessed": "Assessed — {{marks}} / {{max}} marks",
+      "submissionCount": "{{count}} submissions",
+      "unassessedBadge": "{{count}} to assess"
+    }
+  }
+}
