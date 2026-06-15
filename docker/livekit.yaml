@@ -1,0 +1,11 @@
+port: 7880
+bind_addresses:
+  - "0.0.0.0"
+rtc:
+  udp_port_range_start: 50000
+  udp_port_range_end: 50100
+keys:
+  devkey: devsecret
+redis:
+  address: redis:6379
+  password: redis-local-password

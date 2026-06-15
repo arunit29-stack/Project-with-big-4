@@ -1,0 +1,92 @@
+version: "3.9"
+
+services:
+  next-app:
+    build:
+      context: .
+      dockerfile: docker/next-app.Dockerfile
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      REDIS_URL: ${REDIS_URL}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      S3_BUCKET: ${S3_BUCKET}
+      S3_REGION: ${S3_REGION}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      PINECONE_API_KEY: ${PINECONE_API_KEY}
+      PINECONE_ENV: ${PINECONE_ENV}
+      LIVEKIT_API_KEY: ${LIVEKIT_API_KEY}
+      LIVEKIT_SECRET: ${LIVEKIT_SECRET}
+      JWT_SECRET: ${JWT_SECRET}
+      NEXTAUTH_SECRET: ${NEXTAUTH_SECRET}
+      SENTRY_DSN_FRONTEND: ${SENTRY_DSN_FRONTEND}
+      SENTRY_DSN_BACKEND: ${SENTRY_DSN_BACKEND}
+    depends_on:
+      - api-server
+      - ai-service
+      - postgres
+      - redis
+      - media-server
+
+  api-server:
+    build:
+      context: .
+      dockerfile: docker/api-server.Dockerfile
+    ports:
+      - "4000:4000"
+    env_file:
+      - .env
+    depends_on:
+      - postgres
+      - redis
+
+  ai-service:
+    build:
+      context: .
+      dockerfile: docker/ai-service.Dockerfile
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    depends_on:
+      - postgres
+      - redis
+
+  media-server:
+    build:
+      context: .
+      dockerfile: docker/media-server.Dockerfile
+    ports:
+      - "7880:7880"
+      - "7881:7881"
+    env_file:
+      - .env
+    volumes:
+      - ./docker/livekit.yaml:/etc/livekit.yaml:ro
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: cbb
+      POSTGRES_USER: cbb
+      POSTGRES_PASSWORD: cbb-local-password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "yes", "--requirepass", "redis-local-password"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+volumes:
+  postgres_data:
+  redis_data:
