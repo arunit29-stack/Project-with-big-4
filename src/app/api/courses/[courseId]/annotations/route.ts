@@ -1,8 +1,8 @@
 import {
   getAnnotations,
-  parseUserIdFromToken,
   saveAnnotations,
 } from "@/lib/api/contentStore";
+import { requireNextAuth } from "@/lib/server/auth/next";
 import type { PdfAnnotation } from "@/types/content";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -10,10 +10,8 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ courseId: string }> },
 ) {
-  const auth = request.headers.get("authorization");
-  if (!auth?.startsWith("Bearer ")) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  }
+  const auth = await requireNextAuth(request, ["student", "teacher", "admin"]);
+  if (auth instanceof Response) return auth;
 
   const { courseId } = await params;
   const fileId = request.nextUrl.searchParams.get("fileId");
@@ -21,9 +19,8 @@ export async function GET(
     return NextResponse.json({ error: "invalid" }, { status: 400 });
   }
 
-  const userId = parseUserIdFromToken(auth);
   return NextResponse.json({
-    annotations: getAnnotations(courseId, userId, fileId),
+    annotations: getAnnotations(courseId, auth.userId, fileId),
   });
 }
 
@@ -31,13 +28,10 @@ export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ courseId: string }> },
 ) {
-  const auth = request.headers.get("authorization");
-  if (!auth?.startsWith("Bearer ")) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  }
+  const auth = await requireNextAuth(request, ["student", "teacher", "admin"]);
+  if (auth instanceof Response) return auth;
 
   const { courseId } = await params;
-  const userId = parseUserIdFromToken(auth);
 
   let body: { fileId?: string; annotations?: PdfAnnotation[] };
   try {
@@ -51,6 +45,6 @@ export async function POST(
     return NextResponse.json({ error: "invalid" }, { status: 400 });
   }
 
-  saveAnnotations(courseId, userId, fileId, body.annotations);
+  saveAnnotations(courseId, auth.userId, fileId, body.annotations);
   return NextResponse.json({ ok: true });
 }

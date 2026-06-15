@@ -1,25 +1,16 @@
 import { getCourseDetail } from "@/lib/api/courseStore";
+import { requireNextAuth } from "@/lib/server/auth/next";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ courseId: string }> },
 ) {
-  if (!request.headers.get("authorization")?.startsWith("Bearer ")) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  }
+  const auth = await requireNextAuth(request, ["student", "teacher", "admin"]);
+  if (auth instanceof Response) return auth;
 
   const { courseId } = await params;
-  const role = request.nextUrl.searchParams.get("role") as
-    | "student"
-    | "teacher"
-    | null;
-
-  if (role !== "student" && role !== "teacher") {
-    return NextResponse.json({ error: "invalid_role" }, { status: 400 });
-  }
-
-  const course = getCourseDetail(courseId, role);
+  const course = getCourseDetail(courseId, auth.role);
   if (!course) {
     return NextResponse.json({ error: "not_found" }, { status: 404 });
   }

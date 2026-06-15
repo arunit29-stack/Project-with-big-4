@@ -1,22 +1,31 @@
 import { NextRequest, NextResponse } from "next/server";
 import type { LoginResponse, UserRole } from "@/types/auth";
+import { issueLoginToken } from "@/lib/server/auth/next";
 
 /** Dev mock users — replace with real auth service integration. */
 const MOCK_USERS: Record<
   string,
-  { password: string; id: string; role: UserRole }
+  { password: string; id: string; role: UserRole; institutionId: string }
 > = {
-  "student@cbb.edu": { password: "password", id: "u-student-1", role: "student" },
-  "teacher@cbb.edu": { password: "password", id: "u-teacher-1", role: "teacher" },
-  "admin@cbb.edu": { password: "password", id: "u-admin-1", role: "admin" },
+  "student@cbb.edu": {
+    password: "password",
+    id: "u-student-1",
+    role: "student",
+    institutionId: "inst-demo",
+  },
+  "teacher@cbb.edu": {
+    password: "password",
+    id: "u-teacher-1",
+    role: "teacher",
+    institutionId: "inst-demo",
+  },
+  "admin@cbb.edu": {
+    password: "password",
+    id: "u-admin-1",
+    role: "admin",
+    institutionId: "inst-demo",
+  },
 };
-
-function signMockToken(userId: string, role: UserRole): string {
-  const payload = Buffer.from(
-    JSON.stringify({ sub: userId, role, iat: Date.now() }),
-  ).toString("base64url");
-  return `cbb.mock.${payload}`;
-}
 
 export async function POST(request: NextRequest) {
   let email: string;
@@ -36,8 +45,17 @@ export async function POST(request: NextRequest) {
   }
 
   const response: LoginResponse = {
-    token: signMockToken(account.id, account.role),
-    user: { id: account.id, role: account.role, email },
+    token: await issueLoginToken({
+      userId: account.id,
+      role: account.role,
+      institutionId: account.institutionId,
+    }),
+    user: {
+      id: account.id,
+      role: account.role,
+      email,
+      institutionId: account.institutionId,
+    },
   };
 
   return NextResponse.json(response);

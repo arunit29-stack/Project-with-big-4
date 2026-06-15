@@ -2,24 +2,19 @@ import {
   findStudentCourseByCode,
   getStudentCourses,
 } from "@/lib/api/courseStore";
+import { requireNextAuth } from "@/lib/server/auth/next";
 import { NextRequest, NextResponse } from "next/server";
 import type { StudentCourse } from "@/types/course";
 
-function unauthorized() {
-  return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-}
-
 export async function GET(request: NextRequest) {
-  if (!request.headers.get("authorization")?.startsWith("Bearer ")) {
-    return unauthorized();
-  }
+  const auth = await requireNextAuth(request, ["student"]);
+  if (auth instanceof Response) return auth;
   return NextResponse.json({ courses: getStudentCourses() });
 }
 
 export async function POST(request: NextRequest) {
-  if (!request.headers.get("authorization")?.startsWith("Bearer ")) {
-    return unauthorized();
-  }
+  const auth = await requireNextAuth(request, ["student"]);
+  if (auth instanceof Response) return auth;
 
   let code: string;
   try {
