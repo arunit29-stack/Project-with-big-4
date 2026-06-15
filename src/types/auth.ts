@@ -4,6 +4,7 @@ export interface AuthUser {
   id: string;
   role: UserRole;
   email: string;
+  institutionId?: string;
 }
 
 export type AuthStatus =

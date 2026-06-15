@@ -1,35 +1,29 @@
 import {
   addVideoNote,
   getVideoNotes,
-  parseUserIdFromToken,
 } from "@/lib/api/contentStore";
+import { requireNextAuth } from "@/lib/server/auth/next";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ courseId: string; videoId: string }> },
 ) {
-  const auth = request.headers.get("authorization");
-  if (!auth?.startsWith("Bearer ")) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  }
+  const auth = await requireNextAuth(request, ["student", "teacher", "admin"]);
+  if (auth instanceof Response) return auth;
 
   const { courseId, videoId } = await params;
-  const userId = parseUserIdFromToken(auth);
-  return NextResponse.json({ notes: getVideoNotes(courseId, userId, videoId) });
+  return NextResponse.json({ notes: getVideoNotes(courseId, auth.userId, videoId) });
 }
 
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ courseId: string; videoId: string }> },
 ) {
-  const auth = request.headers.get("authorization");
-  if (!auth?.startsWith("Bearer ")) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  }
+  const auth = await requireNextAuth(request, ["student", "teacher", "admin"]);
+  if (auth instanceof Response) return auth;
 
   const { courseId, videoId } = await params;
-  const userId = parseUserIdFromToken(auth);
 
   let body: { timestamp?: number; text?: string };
   try {
@@ -42,7 +36,7 @@ export async function POST(
     return NextResponse.json({ error: "invalid" }, { status: 400 });
   }
 
-  const note = addVideoNote(courseId, userId, videoId, {
+  const note = addVideoNote(courseId, auth.userId, videoId, {
     timestamp: body.timestamp,
     text: body.text.trim(),
   });

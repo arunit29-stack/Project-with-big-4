@@ -1,13 +1,13 @@
 import { createPresign } from "@/lib/api/assignmentStore";
+import { requireNextAuth } from "@/lib/server/auth/next";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ courseId: string; assignmentId: string }> },
 ) {
-  if (!request.headers.get("authorization")?.startsWith("Bearer ")) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  }
+  const auth = await requireNextAuth(request, ["student"]);
+  if (auth instanceof Response) return auth;
 
   await params;
   let body: { fileName?: string; contentType?: string };

@@ -1,4 +1,5 @@
 import { createTusUpload } from "@/lib/api/contentStore";
+import { requireNextAuth } from "@/lib/server/auth/next";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function OPTIONS() {
@@ -9,9 +10,8 @@ export async function OPTIONS() {
 }
 
 export async function POST(request: NextRequest) {
-  if (!request.headers.get("authorization")?.startsWith("Bearer ")) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  }
+  const auth = await requireNextAuth(request, ["teacher", "admin"]);
+  if (auth instanceof Response) return auth;
 
   const courseId = request.nextUrl.pathname.split("/")[3];
   const uploadLength = Number(request.headers.get("upload-length") ?? 0);

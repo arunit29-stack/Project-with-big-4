@@ -1,17 +1,15 @@
-import { confirmStudentSubmission, parseUserId } from "@/lib/api/assignmentStore";
+import { confirmStudentSubmission } from "@/lib/api/assignmentStore";
+import { requireNextAuth } from "@/lib/server/auth/next";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ courseId: string; assignmentId: string }> },
 ) {
-  const auth = request.headers.get("authorization");
-  if (!auth?.startsWith("Bearer ")) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  }
+  const auth = await requireNextAuth(request, ["student"]);
+  if (auth instanceof Response) return auth;
 
   const { courseId, assignmentId } = await params;
-  const userId = parseUserId(auth);
 
   let body: {
     fileName?: string;
@@ -30,7 +28,7 @@ export async function POST(
 
   const version = confirmStudentSubmission(
     courseId,
-    userId,
+    auth.userId,
     assignmentId,
     body.fileName,
     body.submissionToken,

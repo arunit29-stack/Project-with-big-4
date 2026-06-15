@@ -161,9 +161,10 @@ export function createTeacherCourse(input: {
 
 export function getCourseDetail(
   courseId: string,
-  role: "student" | "teacher",
+  role: "student" | "teacher" | "admin",
 ): CourseDetail | undefined {
-  return courseCatalog.find((c) => c.id === courseId && c.role === role);
+  const resolvedRole = role === "admin" ? "teacher" : role;
+  return courseCatalog.find((c) => c.id === courseId && c.role === resolvedRole);
 }
 
 export { generateCourseCode };

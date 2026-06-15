@@ -3,23 +3,18 @@ import {
   generateCourseCode,
   getTeacherCourses,
 } from "@/lib/api/courseStore";
+import { requireNextAuth } from "@/lib/server/auth/next";
 import { NextRequest, NextResponse } from "next/server";
 
-function unauthorized() {
-  return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-}
-
 export async function GET(request: NextRequest) {
-  if (!request.headers.get("authorization")?.startsWith("Bearer ")) {
-    return unauthorized();
-  }
+  const auth = await requireNextAuth(request, ["teacher", "admin"]);
+  if (auth instanceof Response) return auth;
   return NextResponse.json({ courses: getTeacherCourses() });
 }
 
 export async function POST(request: NextRequest) {
-  if (!request.headers.get("authorization")?.startsWith("Bearer ")) {
-    return unauthorized();
-  }
+  const auth = await requireNextAuth(request, ["teacher", "admin"]);
+  if (auth instanceof Response) return auth;
 
   let body: {
     name?: string;
