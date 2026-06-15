@@ -1,12 +1,12 @@
 "use client";
 
 import {
-  ControlBar,
   LiveKitRoom,
   ParticipantTile,
   TrackLoop,
   useTracks,
 } from "@livekit/components-react";
+import { ControlBar } from "@livekit/components-react/prefabs";
 import { Track } from "livekit-client";
 import { useRouter } from "next/navigation";
 import {
