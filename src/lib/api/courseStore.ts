@@ -101,7 +101,9 @@ export function findStudentCourseByCode(
 ): StudentCourse | undefined {
   const normalized = code.trim().toUpperCase();
   const teacherMatch = teacherCourses.find(
-    (c) => c.code.toUpperCase() === normalized && c.enrolmentOpen,
+    (c) =>
+      c.enrolmentOpen &&
+      (c.code.toUpperCase() === normalized || c.id.toUpperCase() === normalized),
   );
   if (!teacherMatch) return undefined;
 
@@ -149,12 +151,30 @@ export function createTeacherCourse(input: {
     hasUpcomingQuiz: false,
   };
   teacherCourses = [course, ...teacherCourses];
+  studentCourses = [
+    {
+      id: course.id,
+      name: course.name,
+      teacherName: "Course instructor",
+      code: course.code,
+      nextDeadline: null,
+      recentContent: null,
+    },
+    ...studentCourses,
+  ];
   courseCatalog.push({
     id: course.id,
     name: course.name,
     code: course.code,
     description: course.description,
     role: "teacher",
+  });
+  courseCatalog.push({
+    id: course.id,
+    name: course.name,
+    code: course.code,
+    description: course.description,
+    role: "student",
   });
   return course;
 }

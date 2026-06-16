@@ -1,6 +1,10 @@
 import rateLimit from "@fastify/rate-limit";
 import Fastify from "fastify";
+import { startNotificationCronJobs } from "../../lib/server/notifications/cron";
+import { attachNotificationSocketServer } from "../../lib/server/notifications/ws";
 import { registerAuthRoutes } from "./auth-routes";
+import { registerNotificationRoutes } from "./notifications-routes";
+import { registerLibraryRoutes } from "./library-routes";
 
 export async function buildApp() {
   const app = Fastify({
@@ -21,6 +25,10 @@ export async function buildApp() {
   });
 
   await registerAuthRoutes(app);
+  await registerNotificationRoutes(app);
+  await registerLibraryRoutes(app);
+  await attachNotificationSocketServer(app.server);
+  startNotificationCronJobs();
 
   app.get("/health", async () => ({ ok: true }));
 

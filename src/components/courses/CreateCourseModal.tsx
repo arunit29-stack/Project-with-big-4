@@ -82,6 +82,8 @@ export function CreateCourseModal({ open, onClose }: CreateCourseModalProps) {
       setDescription("");
       setEnrolmentOpen(true);
       onClose();
+    } catch {
+      // Let the modal stay open so the user can retry instead of crashing the panel.
     } finally {
       setSubmitting(false);
     }
