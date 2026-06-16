@@ -1,0 +1,13 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "noEmit": false,
+    "outDir": "dist",
+    "rootDir": "src",
+    "jsx": "react-jsx",
+    "incremental": false
+  },
+  "include": ["src/lib/server/**/*.ts", "src/server/**/*.ts", "src/types/**/*.d.ts"]
+}

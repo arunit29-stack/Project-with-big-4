@@ -93,12 +93,16 @@ async function getVerificationKey() {
 
 function toAuthContext(token: string, payload: JWTPayload): AuthContext {
   const sub = payload.sub;
+  const email = payload.email;
   const role = payload.role;
   const institutionId = payload.institutionId;
   const jti = payload.jti;
 
   if (typeof sub !== "string") {
     throw new Error("JWT payload missing sub");
+  }
+  if (typeof email !== "string") {
+    throw new Error("JWT payload missing email");
   }
   if (role !== "admin" && role !== "teacher" && role !== "student") {
     throw new Error("JWT payload missing role");
@@ -115,6 +119,7 @@ function toAuthContext(token: string, payload: JWTPayload): AuthContext {
 
   return {
     userId: sub,
+    email,
     role,
     institutionId,
     jti,
@@ -125,13 +130,18 @@ function toAuthContext(token: string, payload: JWTPayload): AuthContext {
 
 export async function issueAccessToken(input: {
   userId: string;
+  email: string;
   role: Role;
   institutionId: string;
 }): Promise<string> {
   const signingKey = await getSigningKey();
   const expiresAt = new Date(Date.now() + MAX_ACCESS_TOKEN_TTL_SECONDS * 1000);
 
-  return new SignJWT({ role: input.role, institutionId: input.institutionId })
+  return new SignJWT({
+    email: input.email,
+    role: input.role,
+    institutionId: input.institutionId,
+  })
     .setProtectedHeader({ alg: "RS256", typ: "JWT" })
     .setSubject(input.userId)
     .setJti(randomUUID())
@@ -160,6 +170,7 @@ export function decodeLogoutToken(token: string): AuthClaims | null {
     const payload = decodeJwt(token) as Partial<AuthClaims>;
     if (
       typeof payload.sub !== "string" ||
+      typeof payload.email !== "string" ||
       payload.role !== "admin" &&
       payload.role !== "teacher" &&
       payload.role !== "student" ||
