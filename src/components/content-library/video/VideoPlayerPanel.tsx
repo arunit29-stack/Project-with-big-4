@@ -5,7 +5,7 @@ import { useVideoNotes } from "@/hooks/useVideoNotes";
 import { formatTimestamp } from "@/lib/formatTime";
 import { useTranslation } from "@/lib/i18n/useTranslation";
 import type { LibraryVideoItem } from "@/types/content";
-import Hls from "hls.js";
+import Hls from "hls.js/dist/hls.js";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 const SPEEDS = [0.5, 0.75, 1, 1.25, 1.5, 2];

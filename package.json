@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@livekit/components-react": "^2.9.21",
-    "hls.js": "^1.6.2",
+    "hls.js": "^1.6.16",
     "idb": "^8.0.2",
     "livekit-client": "^2.19.1",
     "next": "^15.3.3",
