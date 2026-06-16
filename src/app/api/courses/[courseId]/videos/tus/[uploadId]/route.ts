@@ -3,6 +3,7 @@ import {
   getTusUpload,
   patchTusUpload,
 } from "@/lib/api/contentStore";
+import { requireNextAuth } from "@/lib/server/auth/next";
 import { NextRequest, NextResponse } from "next/server";
 
 function tusHeaders(extra: Record<string, string> = {}): Record<string, string> {
@@ -40,9 +41,8 @@ export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ uploadId: string }> },
 ) {
-  if (!request.headers.get("authorization")?.startsWith("Bearer ")) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  }
+  const auth = await requireNextAuth(request, ["teacher", "admin"]);
+  if (auth instanceof Response) return auth;
 
   const { uploadId } = await params;
   const offset = Number(request.headers.get("upload-offset") ?? -1);

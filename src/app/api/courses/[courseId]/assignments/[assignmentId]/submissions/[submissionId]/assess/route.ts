@@ -1,4 +1,5 @@
 import { assessSubmission } from "@/lib/api/assignmentStore";
+import { requireNextAuth } from "@/lib/server/auth/next";
 import type { Assessment } from "@/types/assignment";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -14,9 +15,8 @@ export async function POST(
     }>;
   },
 ) {
-  if (!request.headers.get("authorization")?.startsWith("Bearer ")) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  }
+  const auth = await requireNextAuth(request, ["teacher", "admin"]);
+  if (auth instanceof Response) return auth;
 
   const { courseId, assignmentId, submissionId } = await params;
 

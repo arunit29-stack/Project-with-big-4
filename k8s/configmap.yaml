@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cbb-config
+  namespace: cbb
+data:
+  NODE_ENV: "production"
+  NEXT_PUBLIC_API_URL: "https://api.cbb.example.com"
+  NEXT_PUBLIC_AI_URL: "https://ai.cbb.example.com"
+  NEXT_PUBLIC_LIVEKIT_URL: "wss://livekit.cbb.example.com"
+  INSTITUTION_SSO_CONFIGURED: "true"

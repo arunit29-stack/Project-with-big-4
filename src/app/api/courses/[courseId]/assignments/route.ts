@@ -1,30 +1,25 @@
 import {
   getStudentAssignments,
   getTeacherAssignments,
-  parseUserId,
 } from "@/lib/api/assignmentStore";
+import { requireNextAuth } from "@/lib/server/auth/next";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ courseId: string }> },
 ) {
-  const auth = request.headers.get("authorization");
-  if (!auth?.startsWith("Bearer ")) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  }
+  const auth = await requireNextAuth(request, ["student", "teacher", "admin"]);
+  if (auth instanceof Response) return auth;
 
   const { courseId } = await params;
-  const role = request.nextUrl.searchParams.get("role");
-
-  if (role === "teacher") {
+  if (auth.role === "teacher" || auth.role === "admin") {
     return NextResponse.json({
       assignments: getTeacherAssignments(courseId),
     });
   }
 
-  const userId = parseUserId(auth);
   return NextResponse.json({
-    assignments: getStudentAssignments(courseId, userId),
+    assignments: getStudentAssignments(courseId, auth.userId),
   });
 }

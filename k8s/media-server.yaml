@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: media-server
+  namespace: cbb
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: media-server
+  template:
+    metadata:
+      labels:
+        app: media-server
+    spec:
+      nodeSelector:
+        workload-pool: media
+      containers:
+        - name: media-server
+          image: cbb/media-server:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 7880
+            - name: ws
+              containerPort: 7881
+            - name: rtc-udp
+              containerPort: 50000
+              protocol: UDP
+          envFrom:
+            - configMapRef:
+                name: cbb-config
+            - secretRef:
+                name: cbb-secrets
+          resources:
+            requests:
+              cpu: 500m
+              memory: 512Mi
+            limits:
+              cpu: 2000m
+              memory: 2Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: media-server
+  namespace: cbb
+spec:
+  selector:
+    app: media-server
+  type: LoadBalancer
+  ports:
+    - name: http
+      port: 7880
+      targetPort: 7880
+    - name: ws
+      port: 7881
+      targetPort: 7881
+    - name: rtc-udp
+      port: 50000
+      targetPort: 50000
+      protocol: UDP

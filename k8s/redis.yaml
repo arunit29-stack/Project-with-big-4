@@ -1,0 +1,136 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: redis-config
+  namespace: cbb
+data:
+  redis.conf: |
+    bind 0.0.0.0
+    port 6379
+    protected-mode no
+    appendonly yes
+    cluster-enabled yes
+    cluster-config-file nodes.conf
+    cluster-node-timeout 5000
+    dir /data
+    maxmemory-policy allkeys-lru
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-headless
+  namespace: cbb
+spec:
+  clusterIP: None
+  selector:
+    app: redis
+  ports:
+    - name: redis
+      port: 6379
+      targetPort: 6379
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis
+  namespace: cbb
+spec:
+  selector:
+    app: redis
+  ports:
+    - name: redis
+      port: 6379
+      targetPort: 6379
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: redis
+  namespace: cbb
+spec:
+  serviceName: redis-headless
+  replicas: 6
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      nodeSelector:
+        workload-pool: data
+      containers:
+        - name: redis
+          image: redis:7-alpine
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 6379
+          env:
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: cbb-secrets
+                  key: REDIS_PASSWORD
+          command:
+            - sh
+            - -c
+            - |
+              redis-server /etc/redis/redis.conf --requirepass "$REDIS_PASSWORD" --masterauth "$REDIS_PASSWORD"
+          volumeMounts:
+            - name: redis-config
+              mountPath: /etc/redis
+            - name: redis-data
+              mountPath: /data
+      volumes:
+        - name: redis-config
+          configMap:
+            name: redis-config
+            items:
+              - key: redis.conf
+                path: redis.conf
+  volumeClaimTemplates:
+    - metadata:
+        name: redis-data
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 20Gi
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: redis-cluster-init
+  namespace: cbb
+spec:
+  backoffLimit: 3
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: init
+          image: redis:7-alpine
+          env:
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: cbb-secrets
+                  key: REDIS_PASSWORD
+          command:
+            - sh
+            - -c
+            - |
+              set -e
+              for host in redis-0.redis-headless.cbb.svc.cluster.local redis-1.redis-headless.cbb.svc.cluster.local redis-2.redis-headless.cbb.svc.cluster.local redis-3.redis-headless.cbb.svc.cluster.local redis-4.redis-headless.cbb.svc.cluster.local redis-5.redis-headless.cbb.svc.cluster.local; do
+                until redis-cli -h "$host" -a "$REDIS_PASSWORD" ping; do sleep 2; done
+              done
+              yes yes | redis-cli --cluster create \
+                redis-0.redis-headless.cbb.svc.cluster.local:6379 \
+                redis-1.redis-headless.cbb.svc.cluster.local:6379 \
+                redis-2.redis-headless.cbb.svc.cluster.local:6379 \
+                redis-3.redis-headless.cbb.svc.cluster.local:6379 \
+                redis-4.redis-headless.cbb.svc.cluster.local:6379 \
+                redis-5.redis-headless.cbb.svc.cluster.local:6379 \
+                --cluster-replicas 1 -a "$REDIS_PASSWORD"
