@@ -47,9 +47,11 @@ export async function POST(request: NextRequest) {
   const response: LoginResponse = {
     token: await issueLoginToken({
       userId: account.id,
+      email,
       role: account.role,
       institutionId: account.institutionId,
     }),
+    role: account.role,
     user: {
       id: account.id,
       role: account.role,

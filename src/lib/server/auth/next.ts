@@ -42,6 +42,7 @@ export async function handleLogoutRequest(
 
 export async function issueLoginToken(input: {
   userId: string;
+  email: string;
   role: Role;
   institutionId: string;
 }): Promise<string> {

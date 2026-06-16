@@ -10,7 +10,10 @@ import {
   type ReactNode,
 } from "react";
 import { authReducer, initialAuthState } from "@/lib/auth/authReducer";
-import { sendSessionBeacon } from "@/lib/auth/sessionBeacon";
+import {
+  registerSessionBeaconHandlers,
+  sendSessionBeacon,
+} from "@/lib/auth/sessionBeacon";
 import type { AuthUser, LoginResponse } from "@/types/auth";
 
 const LOGIN_ERROR_MESSAGE =
@@ -83,22 +86,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return;
     }
 
-    const token = state.token;
-
-    const onBeforeUnload = () => sendSessionBeacon(token);
-    const onVisibilityChange = () => {
-      if (document.visibilityState === "hidden") {
-        sendSessionBeacon(token);
-      }
-    };
-
-    window.addEventListener("beforeunload", onBeforeUnload);
-    document.addEventListener("visibilitychange", onVisibilityChange);
-
-    return () => {
-      window.removeEventListener("beforeunload", onBeforeUnload);
-      document.removeEventListener("visibilitychange", onVisibilityChange);
-    };
+    return registerSessionBeaconHandlers(state.token);
   }, [state.status, state.token]);
 
   const value = useMemo<AuthContextValue>(

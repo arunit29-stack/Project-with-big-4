@@ -21,6 +21,7 @@ export interface AuthState {
 
 export interface LoginResponse {
   token: string;
+  role: UserRole;
   user: AuthUser;
 }
 
