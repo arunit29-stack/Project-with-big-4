@@ -1,6 +1,11 @@
 import { randomUUID } from "crypto";
+import { mkdir, readFile, writeFile } from "fs/promises";
+import { join } from "path";
 import {
   decodeJwt,
+  generateKeyPair,
+  exportPKCS8,
+  exportSPKI,
   importPKCS8,
   importSPKI,
   jwtVerify,
@@ -12,37 +17,78 @@ import type { AuthClaims, AuthContext, Role } from "./types";
 export const MAX_ACCESS_TOKEN_TTL_SECONDS = 60 * 60;
 const BLOCKLIST_PREFIX = "cbb:auth:blocklist:";
 
-let signingKeyPromise: ReturnType<typeof importPKCS8> | null = null;
-let verificationKeyPromise: ReturnType<typeof importSPKI> | null = null;
+type KeyMaterial = Awaited<ReturnType<typeof generateKeyPair>>;
+
+let keyMaterialPromise: Promise<KeyMaterial> | null = null;
+const DEV_KEY_CACHE_PATH = join(process.cwd(), ".next", "cache", "cbb-dev-jwt-keys.json");
 
 function normalizePem(value: string): string {
   return value.trim().replace(/\\n/g, "\n");
 }
 
-function getPrivateKeyPem(): string {
-  const pem = process.env.JWT_PRIVATE_KEY;
-  if (!pem) {
-    throw new Error("JWT_PRIVATE_KEY is required for RS256 signing");
-  }
-  return normalizePem(pem);
-}
+async function getKeyMaterial(): Promise<KeyMaterial> {
+  keyMaterialPromise ??= (async () => {
+    const privateKeyPem = process.env.JWT_PRIVATE_KEY;
+    const publicKeyPem = process.env.JWT_PUBLIC_KEY;
 
-function getPublicKeyPem(): string {
-  const pem = process.env.JWT_PUBLIC_KEY;
-  if (!pem) {
-    throw new Error("JWT_PUBLIC_KEY is required for RS256 verification");
-  }
-  return normalizePem(pem);
+    if (privateKeyPem && publicKeyPem) {
+      return {
+        privateKey: await importPKCS8(normalizePem(privateKeyPem), "RS256"),
+        publicKey: await importSPKI(normalizePem(publicKeyPem), "RS256"),
+      };
+    }
+
+    try {
+      const cached = JSON.parse(await readFile(DEV_KEY_CACHE_PATH, "utf8")) as {
+        privateKeyPem?: string;
+        publicKeyPem?: string;
+      };
+
+      if (cached.privateKeyPem && cached.publicKeyPem) {
+        return {
+          privateKey: await importPKCS8(normalizePem(cached.privateKeyPem), "RS256"),
+          publicKey: await importSPKI(normalizePem(cached.publicKeyPem), "RS256"),
+        };
+      }
+    } catch {
+      // No cached dev keypair yet; generate one below.
+    }
+
+    const generated = await generateKeyPair("RS256");
+    try {
+      await mkdir(join(process.cwd(), ".next", "cache"), { recursive: true });
+      await writeFile(
+        DEV_KEY_CACHE_PATH,
+        JSON.stringify(
+          {
+            privateKeyPem: await exportPKCS8(generated.privateKey),
+            publicKeyPem: await exportSPKI(generated.publicKey),
+          },
+          null,
+          2,
+        ),
+        "utf8",
+      );
+    } catch (error) {
+      console.warn("[auth] unable to persist dev JWT keypair", error);
+    }
+    console.warn(
+      "[auth] JWT_PRIVATE_KEY/JWT_PUBLIC_KEY not set; using a persisted dev RSA keypair",
+    );
+    return generated;
+  })();
+
+  return keyMaterialPromise;
 }
 
 async function getSigningKey() {
-  signingKeyPromise ??= importPKCS8(getPrivateKeyPem(), "RS256");
-  return signingKeyPromise;
+  const { privateKey } = await getKeyMaterial();
+  return privateKey;
 }
 
 async function getVerificationKey() {
-  verificationKeyPromise ??= importSPKI(getPublicKeyPem(), "RS256");
-  return verificationKeyPromise;
+  const { publicKey } = await getKeyMaterial();
+  return publicKey;
 }
 
 function toAuthContext(token: string, payload: JWTPayload): AuthContext {
@@ -136,6 +182,9 @@ export function blocklistKey(jti: string): string {
 
 export async function isTokenBlocked(jti: string): Promise<boolean> {
   const client = await import("./redis").then((module) => module.getRedisClient());
+  if (!client) {
+    return false;
+  }
   const blocked = await client.get(blocklistKey(jti));
   return blocked !== null;
 }
@@ -143,6 +192,9 @@ export async function isTokenBlocked(jti: string): Promise<boolean> {
 export async function revokeTokenByJti(jti: string, expiresAt: number): Promise<void> {
   const ttlSeconds = Math.max(1, expiresAt - Math.floor(Date.now() / 1000));
   const client = await import("./redis").then((module) => module.getRedisClient());
+  if (!client) {
+    return;
+  }
   await client.set(blocklistKey(jti), "1", { EX: ttlSeconds });
 }
 

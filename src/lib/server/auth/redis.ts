@@ -1,23 +1,63 @@
-import { createClient, type RedisClientType } from "redis";
+type RedisLikeClient = {
+  connect: () => Promise<unknown>;
+  get: (key: string) => Promise<string | null>;
+  set: (
+    key: string,
+    value: string,
+    options?: { EX?: number },
+  ) => Promise<unknown>;
+  on: (event: "error", listener: (error: Error) => void) => void;
+};
 
-let redisClientPromise: Promise<RedisClientType> | null = null;
+type RedisModule = {
+  createClient: (options: { url: string }) => RedisLikeClient;
+};
 
-function getRedisUrl(): string {
+let redisClientPromise: Promise<RedisLikeClient | null> | null = null;
+
+function getRedisUrl(): string | null {
   const url = process.env.REDIS_URL;
   if (!url) {
-    throw new Error("REDIS_URL is required for RBAC blocklist checks");
+    return null;
   }
   return url;
 }
 
-export function getRedisClient(): Promise<RedisClientType> {
+async function loadRedisModule(): Promise<RedisModule | null> {
+  try {
+    return (await new Function("return import('redis')")()) as RedisModule;
+  } catch {
+    return null;
+  }
+}
+
+export function getRedisClient(): Promise<RedisLikeClient | null> {
   if (!redisClientPromise) {
-    const client = createClient({ url: getRedisUrl() });
-    client.on("error", (error) => {
-      console.error("[redis] client error", error);
-    });
-    redisClientPromise = client.connect().then(() => client);
+    redisClientPromise = (async () => {
+      const url = getRedisUrl();
+      if (!url) {
+        return null;
+      }
+
+      const redisModule = await loadRedisModule();
+      if (!redisModule) {
+        return null;
+      }
+
+      const client = redisModule.createClient({ url });
+      client.on("error", (error: Error) => {
+        console.error("[redis] client error", error);
+      });
+
+      try {
+        await client.connect();
+        return client;
+      } catch (error) {
+        console.error("[redis] connect failed", error);
+        return null;
+      }
+    })();
   }
 
-  return redisClientPromise;
+  return redisClientPromise!;
 }

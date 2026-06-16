@@ -1,6 +1,23 @@
-import type { FastifyReply, FastifyRequest, preHandlerHookHandler } from "fastify";
 import { verifyAccessToken } from "./jwt";
 import type { AuthContext, Role } from "./types";
+
+type FastifyReply = {
+  code: (statusCode: number) => {
+    send: (payload: unknown) => unknown;
+  };
+};
+
+type FastifyRequest = {
+  headers: {
+    authorization?: string;
+  };
+  auth: AuthContext;
+};
+
+type PreHandlerHookHandler = (
+  request: FastifyRequest,
+  reply: FastifyReply,
+) => Promise<void> | void;
 
 function unauthorized(reply: FastifyReply) {
   return reply.code(401).send({ error: "unauthorized" });
@@ -32,14 +49,16 @@ export async function authenticateFastifyRequest(
   }
 }
 
-export function requireAuth(allowedRoles: Role[]): preHandlerHookHandler {
+export function requireAuth(allowedRoles: Role[]): PreHandlerHookHandler {
   return async (request, reply) => {
     const auth = await authenticateFastifyRequest(request);
     if (!auth) {
-      return unauthorized(reply);
+      unauthorized(reply);
+      return;
     }
     if (allowedRoles.length > 0 && !allowedRoles.includes(auth.role)) {
-      return forbidden(reply);
+      forbidden(reply);
+      return;
     }
 
     request.auth = auth;
