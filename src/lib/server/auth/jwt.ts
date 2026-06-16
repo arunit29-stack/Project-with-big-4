@@ -54,7 +54,9 @@ async function getKeyMaterial(): Promise<KeyMaterial> {
       // No cached dev keypair yet; generate one below.
     }
 
-    const generated = await generateKeyPair("RS256");
+    const generated = await generateKeyPair("RS256", {
+    extractable: true,
+    });
     try {
       await mkdir(join(process.cwd(), ".next", "cache"), { recursive: true });
       await writeFile(

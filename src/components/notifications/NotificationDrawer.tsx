@@ -53,12 +53,12 @@ export function NotificationDrawer() {
                   <button
                     type="button"
                     onClick={() => handleNotificationClick(n)}
-                    className={`w-full px-4 py-3 text-left transition hover:bg-slate-50 ${
-                      !n.read ? "bg-brand-50/50" : ""
+                      className={`w-full px-4 py-3 text-left transition hover:bg-slate-50 ${
+                      !n.readAt ? "bg-brand-50/50" : ""
                     }`}
                   >
-                    <p className="text-xs font-medium text-brand-700">{n.courseName}</p>
-                    <p className="mt-0.5 text-sm text-slate-800">{n.description}</p>
+                    <p className="text-xs font-medium text-brand-700">{n.courseName ?? "Notification"}</p>
+                    <p className="mt-0.5 text-sm text-slate-800">{n.message}</p>
                     <p className="mt-1 text-xs text-slate-500">
                       {formatRelativeTime(n.createdAt)}
                     </p>

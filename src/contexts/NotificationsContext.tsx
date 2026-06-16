@@ -79,11 +79,12 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
         setNotifications([
           {
             id: "dev-1",
+            type: "course_announcement",
+            courseId: null,
             courseName: "Biology 101",
-            description: "New assignment posted",
+            message: "New assignment posted",
+            navigateTo: "/class",
             createdAt: new Date().toISOString(),
-            read: false,
-            href: "/class",
           },
         ]);
         setUnreadCount(1);
@@ -107,7 +108,7 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
       },
     }).catch(() => {});
 
-    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+    setNotifications((prev) => prev.map((n) => ({ ...n, readAt: n.readAt ?? new Date().toISOString() })));
     setUnreadCount(0);
     markedReadRef.current = false;
   }, [token]);
@@ -132,7 +133,9 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
   const handleNotificationClick = useCallback(
     (notification: Notification) => {
       setDrawerOpen(false);
-      router.push(notification.href);
+      if (notification.navigateTo) {
+        router.push(notification.navigateTo);
+      }
     },
     [router],
   );
