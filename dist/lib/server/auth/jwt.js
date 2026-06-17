@@ -74,7 +74,9 @@ async function getKeyMaterial() {
         catch (_a) {
             // No cached dev keypair yet; generate one below.
         }
-        const generated = await (0, jose_1.generateKeyPair)("RS256");
+        const generated = await (0, jose_1.generateKeyPair)("RS256", {
+            extractable: true,
+        });
         try {
             await (0, promises_1.mkdir)((0, path_1.join)(process.cwd(), ".next", "cache"), { recursive: true });
             await (0, promises_1.writeFile)(DEV_KEY_CACHE_PATH, JSON.stringify({

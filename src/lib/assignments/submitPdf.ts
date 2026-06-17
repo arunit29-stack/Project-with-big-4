@@ -3,21 +3,19 @@ import type { PresignResponse } from "@/types/assignment";
 export async function presignSubmission(
   courseId: string,
   assignmentId: string,
-  fileName: string,
+  file: File,
   token: string,
 ): Promise<PresignResponse> {
   const res = await fetch(
-    `/api/courses/${courseId}/assignments/${assignmentId}/submissions/presign`,
+    `/api/courses/${courseId}/assignments/${assignmentId}/submit`,
     {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        fileName,
-        contentType: "application/pdf",
-      }),
+      headers: { Authorization: `Bearer ${token}` },
+      body: (() => {
+        const form = new FormData();
+        form.append("file", file);
+        return form;
+      })(),
     },
   );
   if (!res.ok) throw new Error("presign_failed");
@@ -56,7 +54,7 @@ export async function confirmSubmission(
   studentName: string,
 ): Promise<void> {
   const res = await fetch(
-    `/api/courses/${courseId}/assignments/${assignmentId}/submissions/confirm`,
+    `/api/courses/${courseId}/assignments/${assignmentId}/submit/confirm`,
     {
       method: "POST",
       headers: {

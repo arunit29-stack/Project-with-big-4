@@ -10,17 +10,11 @@ export async function POST(
   if (auth instanceof Response) return auth;
 
   const { courseId, assignmentId } = await params;
-
-  let body: {
+  const body = (await request.json()) as {
     fileName?: string;
     submissionToken?: string;
     studentName?: string;
   };
-  try {
-    body = await request.json();
-  } catch {
-    return NextResponse.json({ error: "invalid" }, { status: 400 });
-  }
 
   if (!body.submissionToken || !body.fileName) {
     return NextResponse.json({ error: "invalid" }, { status: 400 });

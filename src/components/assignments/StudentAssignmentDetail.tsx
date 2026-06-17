@@ -93,7 +93,7 @@ export function StudentAssignmentDetail({
         const presign = await presignSubmission(
           courseId,
           assignmentId,
-          file.name,
+          file,
           token,
         );
         await uploadToS3(presign.uploadUrl, file, setProgress);
