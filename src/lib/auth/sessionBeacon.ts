@@ -4,6 +4,7 @@ let beaconSent = false;
 /** Fire-and-forget session teardown beacon (EXIT_ON_CLOSE). */
 export function sendSessionBeacon(token: string | null): void {
   if (
+    process.env.NODE_ENV === "development" ||
     beaconSent ||
     !token ||
     typeof navigator === "undefined" ||

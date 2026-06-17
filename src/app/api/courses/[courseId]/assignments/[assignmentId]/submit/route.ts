@@ -12,10 +12,8 @@ export async function POST(
   const { courseId, assignmentId } = await params;
   const form = await request.formData().catch(() => null);
   const file = form?.get("file");
-  const fileName =
-    file instanceof File ? file.name : "submission.pdf";
-  const contentType =
-    file instanceof File ? file.type || "application/pdf" : "application/pdf";
+  const fileName = file instanceof File ? file.name : "submission.pdf";
+  const contentType = file instanceof File ? file.type || "application/pdf" : "application/pdf";
 
   try {
     return NextResponse.json(
@@ -28,8 +26,9 @@ export async function POST(
       }),
     );
   } catch (error) {
+    const message = (error as Error).message;
     return NextResponse.json(
-      { error: (error as Error).message === "not_found" ? "not_found" : "invalid" },
+      { error: message === "not_found" ? "not_found" : "invalid" },
       { status: 400 },
     );
   }

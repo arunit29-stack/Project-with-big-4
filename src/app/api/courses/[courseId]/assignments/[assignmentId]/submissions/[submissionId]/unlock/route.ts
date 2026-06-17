@@ -1,5 +1,5 @@
 import { requireNextAuth } from "@/lib/server/auth/next";
-import { assessSubmission } from "@/lib/server/assignments/service";
+import { unlockSubmission } from "@/lib/server/assignments/service";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(
@@ -18,42 +18,21 @@ export async function POST(
   if (auth instanceof Response) return auth;
 
   const { courseId, assignmentId, submissionId } = await params;
-
-  let body: {
-    rubricScores?: Array<{ criterion: string; score: number; comment: string }>;
-    overallFeedback?: string;
-    waiveLate?: boolean;
-  };
   try {
-    body = await request.json();
-  } catch {
-    return NextResponse.json({ error: "invalid" }, { status: 400 });
-  }
-
-  if (!body.rubricScores || typeof body.overallFeedback !== "string") {
-    return NextResponse.json({ error: "invalid" }, { status: 400 });
-  }
-
-  try {
-    await assessSubmission({
+    const ok = await unlockSubmission({
       courseId,
       assignmentId,
       submissionId,
       teacherId: auth.userId,
-      rubricScores: body.rubricScores.map((item) => ({
-        criterionId: item.criterion,
-        score: item.score,
-        comment: item.comment,
-      })),
-      overallFeedback: body.overallFeedback,
-      waiveLate: body.waiveLate ?? false,
     });
+    if (!ok) {
+      return NextResponse.json({ error: "not_found" }, { status: 404 });
+    }
+    return NextResponse.json({ ok: true });
   } catch (error) {
     if ((error as Error).message === "forbidden") {
       return NextResponse.json({ error: "forbidden" }, { status: 403 });
     }
     return NextResponse.json({ error: "not_found" }, { status: 404 });
   }
-
-  return NextResponse.json({ ok: true });
 }

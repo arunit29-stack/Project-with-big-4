@@ -44,7 +44,7 @@ export function useOfflineSubmissionSync(
         const presign = await presignSubmission(
           entry.courseId,
           entry.assignmentId,
-          entry.fileName,
+          file,
           token,
         );
         await uploadToS3(presign.uploadUrl, file, () => {});

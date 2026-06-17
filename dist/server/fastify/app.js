@@ -9,8 +9,10 @@ const fastify_1 = __importDefault(require("fastify"));
 const cron_1 = require("../../lib/server/notifications/cron");
 const ws_1 = require("../../lib/server/notifications/ws");
 const auth_routes_1 = require("./auth-routes");
+const live_session_routes_1 = require("./live-session-routes");
 const notifications_routes_1 = require("./notifications-routes");
 const library_routes_1 = require("./library-routes");
+const ws_2 = require("../../lib/server/live-session/ws");
 async function buildApp() {
     const app = (0, fastify_1.default)({
         logger: true,
@@ -26,6 +28,11 @@ async function buildApp() {
     await (0, notifications_routes_1.registerNotificationRoutes)(app);
     await (0, library_routes_1.registerLibraryRoutes)(app);
     await (0, ws_1.attachNotificationSocketServer)(app.server);
+    const io = (0, ws_1.getNotificationSocketServer)();
+    if (io) {
+        (0, ws_2.attachLiveSessionSocketServer)(io);
+    }
+    await (0, live_session_routes_1.registerLiveSessionRoutes)(app);
     (0, cron_1.startNotificationCronJobs)();
     app.get("/health", async () => ({ ok: true }));
     return app;
