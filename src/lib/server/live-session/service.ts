@@ -240,7 +240,7 @@ export async function listDmThread(input: {
   courseId: string;
   studentId: string;
 }): Promise<Array<{ id: string; senderId: string; senderRole: "teacher" | "student"; type: "text" | "voice_note" | "file"; body: string | null; fileKey: string | null; createdAt: string }>> {
-  const result = await getPostgresPool().query<any>(
+  const result = await getPostgresPool().query(
     `
       SELECT id, sender_id, sender_role, message_type, body, file_key, created_at
       FROM live_session_dms

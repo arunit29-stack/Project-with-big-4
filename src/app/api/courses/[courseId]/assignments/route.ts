@@ -37,6 +37,8 @@ export async function POST(
     title?: string;
     description?: string;
     deadlineUtc?: string;
+    fileKey?: string | null;
+    fileName?: string | null;
     rubric?: Array<{ criterion?: string; descriptor?: string; maxMarks?: number }>;
     latePolicy?: {
       type?: "percentage_per_day" | "hard_cutoff";
@@ -68,6 +70,8 @@ export async function POST(
     description: body.description,
     deadlineUtc: body.deadlineUtc,
     rubric,
+    fileKey: body.fileKey,
+    fileName: body.fileName,
     latePolicy:
       body.latePolicy.type === "percentage_per_day"
         ? {

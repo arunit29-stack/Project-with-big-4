@@ -35,7 +35,7 @@ type ChatEnvelope =
   | { type: "chat:slow-mode"; payload: { seconds: number } }
   | { type: "session:ended"; payload: { sessionId: string } }
   | { type: "rec:started"; payload: { consentBanner: { title: string; body: string } } }
-  | { type: "rec:stopped"; payload: {} };
+  | { type: "rec:stopped"; payload: Record<string, never> };
 
 function getSessionIdFromNamespace(namespace: string): string | null {
   const match = namespace.match(/^\/sessions\/([^/]+)\/chat$/);

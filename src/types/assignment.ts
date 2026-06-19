@@ -12,6 +12,12 @@ export interface Assignment {
   deadline: string;
   rubric: RubricCriterion[];
   latePenaltyPercent: number;
+  fileKey?: string;
+  fileName?: string;
+  fileUrl?: string;
+  solutionKey?: string;
+  solutionName?: string;
+  solutionUrl?: string;
 }
 
 export type StudentSubmissionStatus =

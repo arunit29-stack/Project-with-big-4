@@ -370,6 +370,7 @@ export function LiveQuiz({ courseId, role }: LiveQuizProps) {
   }, []);
 
   useEffect(() => {
+    if (!token) return;
     const socket = io(socketUrl ?? window.location.origin, {
       path: "/socket.io",
       transports: ["websocket", "polling"],

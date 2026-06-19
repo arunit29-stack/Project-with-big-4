@@ -12,7 +12,9 @@ import {
 import { useTranslation } from "@/lib/i18n/useTranslation";
 import type { TeacherAssignmentListItem } from "@/types/assignment";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useState } from "react";
 import useSWR from "swr";
+import { CreateAssignmentModal } from "./CreateAssignmentModal";
 
 interface TeacherAssignmentListProps {
   courseId: string;
@@ -28,8 +30,9 @@ export function TeacherAssignmentList({
   const router = useRouter();
   const searchParams = useSearchParams();
   const tz = getUserTimeZone();
+  const [createOpen, setCreateOpen] = useState(false);
 
-  const { data, isLoading } = useSWR<{
+  const { data, isLoading, mutate } = useSWR<{
     assignments: TeacherAssignmentListItem[];
   }>(
     token
@@ -62,6 +65,17 @@ export function TeacherAssignmentList({
 
   return (
     <div>
+      <div className="mb-6 flex items-center justify-between">
+        <h2 className="text-lg font-bold text-slate-900">Course Assignments</h2>
+        <button
+          type="button"
+          onClick={() => setCreateOpen(true)}
+          className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-700"
+        >
+          Create Assignment
+        </button>
+      </div>
+
       {unassessedTotal > 0 && (
         <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-amber-100 px-4 py-2 text-sm font-medium text-amber-900">
           {t("assignments.teacher.unassessedBadge", { count: unassessedTotal })}
@@ -112,6 +126,13 @@ export function TeacherAssignmentList({
           })}
         </ul>
       )}
+
+      <CreateAssignmentModal
+        courseId={courseId}
+        open={createOpen}
+        onClose={() => setCreateOpen(false)}
+        onCreated={() => void mutate()}
+      />
     </div>
   );
 }

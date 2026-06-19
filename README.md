@@ -60,4 +60,21 @@ Set `INSTITUTION_SSO_CONFIGURED=true` in `.env.local` to show the institution SS
 - WebSocket: `/ws/notifications` (requires a custom Node server or reverse proxy; Next.js API routes do not upgrade WS by default).
 - Drawer open → `PATCH /api/notifications/read-all`
 - Clear all → `DELETE /api/notifications`
-# Project-with-big-4
+
+## Quiz Engine API
+
+A real-time, multi-instance scaled Quiz Engine with state stored entirely in Redis and database persistence in PostgreSQL.
+
+### Endpoints
+- **Quiz Creation**: `POST /courses/:courseId/quizzes` (Teacher only)
+- **Launch Lobby**: `POST /quizzes/:quizId/launch` (Teacher only; sets lobby status and returns 60s countdown)
+- **Extend Lobby**: `POST /quizzes/:quizId/lobby/extend` (Teacher only; adds 30s, max 5 extensions)
+- **Start Quiz**: `POST /quizzes/:quizId/start` (Teacher only; transitions to first question immediately)
+- **Answer Submission**: `POST /quizzes/:quizId/attempts/:attemptId/answers` (Student only; auto-saves answer selection and calculates speed multipliers. Blocks duplicate device attempts with `409` and flags teacher's integrity log)
+- **Reconnect State**: `GET /quizzes/:quizId/attempts/:attemptId/state` (Student only; returns current live question and remaining time)
+- **Void Question**: `POST /quizzes/:quizId/questions/:questionId/void` (Teacher only; marks question as voided, redistributes its points proportionally to remaining questions, and recalculates all students' scores and XP ledger)
+
+### Real-Time Sockets & Pub/Sub
+- Socket.io connections bind to the `/quizzes/:quizId` namespace.
+- Live question pushes, lobby countdown updates, and student joining events are synchronized across server instances using the Redis Pub/Sub channel `quiz:{quizId}:broadcast`.
+
