@@ -163,6 +163,34 @@ export function StudentAssignmentDetail({
         <p>{assignment.description}</p>
       </div>
 
+      {assignment.fileUrl && (
+        <div className="mb-6 p-4 rounded-xl border border-slate-200 bg-white text-sm">
+          <span className="font-semibold text-slate-700">Assignment Attachment: </span>
+          <a
+            href={assignment.fileUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-brand-600 hover:underline font-medium"
+          >
+            {assignment.fileName || "Download PDF"}
+          </a>
+        </div>
+      )}
+
+      {assignment.solutionUrl && (
+        <div className="mb-6 p-4 rounded-xl border border-emerald-200 bg-emerald-50 text-sm">
+          <span className="font-semibold text-emerald-950 font-bold">Official Solutions: </span>
+          <a
+            href={assignment.solutionUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-emerald-700 hover:underline font-medium"
+          >
+            {assignment.solutionName || "Solutions PDF"}
+          </a>
+        </div>
+      )}
+
       <div className="mb-8">
         <RubricDisplay criteria={assignment.rubric} />
       </div>

@@ -363,6 +363,7 @@ export function LiveSession({ courseId, role }: LiveSessionProps) {
   }, []);
 
   useEffect(() => {
+    if (!token) return;
     const socket = io(socketUrl ?? window.location.origin, {
       path: "/socket.io",
       transports: ["websocket", "polling"],

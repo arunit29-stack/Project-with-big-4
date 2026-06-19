@@ -28,6 +28,10 @@ type AssignmentRow = {
   late_policy: LatePolicy;
   created_by: string;
   created_at: string;
+  file_key: string | null;
+  file_name: string | null;
+  solution_key: string | null;
+  solution_name: string | null;
 };
 
 type SubmissionRow = {
@@ -63,6 +67,12 @@ function toAssignment(row: AssignmentRow): Assignment {
     deadline: row.deadline_utc,
     rubric: row.rubric,
     latePenaltyPercent,
+    fileKey: row.file_key ?? undefined,
+    fileName: row.file_name ?? undefined,
+    fileUrl: row.file_key ? fileUrl(row.file_key) : undefined,
+    solutionKey: row.solution_key ?? undefined,
+    solutionName: row.solution_name ?? undefined,
+    solutionUrl: row.solution_key ? fileUrl(row.solution_key) : undefined,
   };
 }
 
@@ -125,6 +135,8 @@ export async function createAssignment(input: {
   deadlineUtc: string;
   rubric: RubricCriterion[];
   latePolicy: LatePolicy;
+  fileKey?: string | null;
+  fileName?: string | null;
 }): Promise<Assignment> {
   if (!(await ensureTeacherOwnsCourse(input.teacherId, input.courseId))) {
     throw new Error("forbidden");
@@ -133,8 +145,8 @@ export async function createAssignment(input: {
   await getPostgresPool().query(
     `
       INSERT INTO assignments (
-        id, course_id, title, description, deadline_utc, rubric, late_policy, created_by
-      ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
+        id, course_id, title, description, deadline_utc, rubric, late_policy, created_by, file_key, file_name
+      ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)
     `,
     [
       id,
@@ -145,6 +157,8 @@ export async function createAssignment(input: {
       JSON.stringify(input.rubric),
       JSON.stringify(input.latePolicy),
       input.teacherId,
+      input.fileKey ?? null,
+      input.fileName ?? null,
     ],
   );
   return {
@@ -157,6 +171,9 @@ export async function createAssignment(input: {
       input.latePolicy.type === "percentage_per_day"
         ? input.latePolicy.deductionPercent ?? 0
         : 100,
+    fileKey: input.fileKey ?? undefined,
+    fileName: input.fileName ?? undefined,
+    fileUrl: input.fileKey ? fileUrl(input.fileKey) : undefined,
   };
 }
 
@@ -443,4 +460,25 @@ export async function listTeacherAssignments(courseId: string, teacherId: string
     [courseId],
   );
   return result.rows.map(toAssignment);
+}
+
+export async function attachSolutionsToAssignment(input: {
+  courseId: string;
+  assignmentId: string;
+  teacherId: string;
+  solutionKey: string;
+  solutionName: string;
+}): Promise<boolean> {
+  if (!(await ensureTeacherOwnsCourse(input.teacherId, input.courseId))) {
+    throw new Error("forbidden");
+  }
+  const result = await getPostgresPool().query(
+    `
+      UPDATE assignments
+      SET solution_key = $1, solution_name = $2
+      WHERE course_id = $3 AND id = $4
+    `,
+    [input.solutionKey, input.solutionName, input.courseId, input.assignmentId],
+  );
+  return (result.rowCount ?? 0) > 0;
 }

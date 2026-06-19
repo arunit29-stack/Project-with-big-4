@@ -79,6 +79,7 @@ export async function buildLibraryTree(courseId: string, role: Role, userId: str
   }
 
   const rows = await listLibraryFiles(courseId);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const weeks = new Map<number, Map<string, any[]>>();
   for (const row of rows) {
     if (role === "student" && row.status !== "ready") continue;

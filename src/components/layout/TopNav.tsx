@@ -3,6 +3,8 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { UnassessedNavBadge } from "@/components/assignments/UnassessedNavBadge";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
+import Link from "next/link";
+import { homeRouteForRole } from "@/lib/auth/redirects";
 
 export function TopNav() {
   const { user, logout } = useAuth();
@@ -10,7 +12,42 @@ export function TopNav() {
   return (
     <header className="sticky top-0 z-40 border-b border-slate-200 bg-white">
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
-        <span className="text-lg font-semibold text-brand-700">CBB</span>
+        <div className="flex items-center gap-6">
+          <Link
+            href={user ? homeRouteForRole(user.role) : "/login"}
+            className="text-lg font-bold text-brand-700 hover:text-brand-800"
+          >
+            CBB
+          </Link>
+          {user && (
+            <nav className="flex items-center gap-4">
+              {user.role === "student" && (
+                <Link
+                  href="/class"
+                  className="text-sm font-medium text-slate-600 hover:text-slate-900"
+                >
+                  My Classes
+                </Link>
+              )}
+              {(user.role === "teacher" || user.role === "admin") && (
+                <Link
+                  href="/dashboard"
+                  className="text-sm font-medium text-slate-600 hover:text-slate-900"
+                >
+                  Dashboard
+                </Link>
+              )}
+              {user.role === "admin" && (
+                <Link
+                  href="/admin"
+                  className="text-sm font-medium text-slate-600 hover:text-slate-900"
+                >
+                  Admin
+                </Link>
+              )}
+            </nav>
+          )}
+        </div>
 
         <div className="flex items-center gap-4">
           <UnassessedNavBadge />
@@ -34,3 +71,4 @@ export function TopNav() {
     </header>
   );
 }
+
