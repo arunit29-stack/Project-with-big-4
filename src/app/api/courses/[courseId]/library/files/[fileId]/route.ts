@@ -10,6 +10,11 @@ export async function DELETE(
   if (auth instanceof Response) return auth;
 
   const { courseId, fileId } = await params;
-  const ok = await deleteLibraryFile(courseId, fileId);
+  let ok = false;
+  try {
+    ok = await deleteLibraryFile(courseId, fileId);
+  } catch {
+    return NextResponse.json({ error: "archive_failed" }, { status: 502 });
+  }
   return NextResponse.json({ ok });
 }

@@ -1,0 +1,8 @@
+[project]
+name = "cbb-ai-service"
+version = "0.1.0"
+description = "CBB RAG ingestion service"
+requires-python = ">=3.12"
+
+[tool.pytest.ini_options]
+pythonpath = ["."]

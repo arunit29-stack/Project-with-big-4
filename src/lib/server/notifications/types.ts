@@ -2,6 +2,7 @@ export type NotificationType =
   | "new_assignment_posted"
   | "quiz_starting_soon"
   | "new_content_uploaded"
+  | "content_processing_failed"
   | "grade_released"
   | "course_announcement"
   | "peer_review_assigned"

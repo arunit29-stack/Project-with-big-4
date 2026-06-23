@@ -2,12 +2,14 @@ import { PutObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { randomUUID } from "crypto";
 import { getRedisClient } from "../auth/redis";
+import { archiveRagFile, queueRagIngestion } from "../ai/service";
 import { getR2Bucket, getR2Client } from "./r2";
 import {
   confirmPdfFile,
   createPdfDraft,
   createTusSession,
   listLibraryFiles,
+  markLibraryFileFailed,
   softDeleteLibraryFile,
   updateVideoStatus,
   verifyStudentEnrollment,
@@ -70,7 +72,24 @@ export async function confirmPdfUpload(input: {
   topic: string;
   fileName: string;
 }): Promise<boolean> {
-  return confirmPdfFile(input);
+  const confirmed = await confirmPdfFile(input);
+  if (!confirmed) {
+    return false;
+  }
+  try {
+    await queueRagIngestion({
+      courseId: input.courseId,
+      fileId: input.fileId,
+    });
+  } catch (error) {
+    await markLibraryFileFailed({
+      courseId: input.courseId,
+      fileId: input.fileId,
+      error: error instanceof Error ? error.message : "rag_ingestion_queue_failed",
+    });
+    throw error;
+  }
+  return true;
 }
 
 export async function buildLibraryTree(courseId: string, role: Role, userId: string) {
@@ -126,7 +145,11 @@ export async function buildLibraryTree(courseId: string, role: Role, userId: str
 }
 
 export async function deleteLibraryFile(courseId: string, fileId: string) {
-  return softDeleteLibraryFile(courseId, fileId);
+  const deleted = await softDeleteLibraryFile(courseId, fileId);
+  if (deleted) {
+    await archiveRagFile({ courseId, fileId });
+  }
+  return deleted;
 }
 
 export async function createVideoTusSession(input: {

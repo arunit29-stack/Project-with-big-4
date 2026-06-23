@@ -94,7 +94,7 @@ export async function confirmPdfFile(input: {
   const result = await getPostgresPool().query(
     `
       UPDATE course_library_files
-      SET status = 'ready',
+      SET status = 'processing',
           file_name = $4,
           week_number = $3,
           topic_name = $5,
@@ -107,6 +107,23 @@ export async function confirmPdfFile(input: {
     [input.fileId, input.courseId, input.week, input.fileName, input.topic],
   );
   return (result.rowCount ?? 0) > 0;
+}
+
+export async function markLibraryFileFailed(input: {
+  courseId: string;
+  fileId: string;
+  error: string;
+}): Promise<void> {
+  await getPostgresPool().query(
+    `
+      UPDATE course_library_files
+      SET status = 'failed',
+          ingestion_error = $3,
+          updated_at = NOW()
+      WHERE id = $1 AND course_id = $2
+    `,
+    [input.fileId, input.courseId, input.error.slice(0, 4000)],
+  );
 }
 
 export async function softDeleteLibraryFile(

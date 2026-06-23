@@ -37,13 +37,20 @@ async function registerLibraryRoutes(app) {
             typeof body.fileName !== "string") {
             return reply.code(400).send({ error: "invalid" });
         }
-        const ok = await (0, service_1.confirmPdfUpload)({
-            courseId,
-            fileId: body.fileId,
-            week: body.week,
-            topic: body.topic,
-            fileName: body.fileName,
-        });
+        let ok = false;
+        try {
+            ok = await (0, service_1.confirmPdfUpload)({
+                courseId,
+                fileId: body.fileId,
+                week: body.week,
+                topic: body.topic,
+                fileName: body.fileName,
+            });
+        }
+        catch (error) {
+            request.log.error({ error }, "pdf ingestion queue failed");
+            return reply.code(502).send({ error: "ingestion_queue_failed" });
+        }
         if (!ok)
             return reply.code(404).send({ error: "not_found" });
         return reply.send({ ok: true, indexQueued: true });
@@ -63,7 +70,14 @@ async function registerLibraryRoutes(app) {
     });
     app.delete("/courses/:courseId/library/files/:fileId", { preHandler: (0, fastify_1.requireAuth)(["teacher"]) }, async (request, reply) => {
         const { courseId, fileId } = request.params;
-        const ok = await (0, service_1.deleteLibraryFile)(courseId, fileId);
+        let ok = false;
+        try {
+            ok = await (0, service_1.deleteLibraryFile)(courseId, fileId);
+        }
+        catch (error) {
+            request.log.error({ error }, "rag archive failed");
+            return reply.code(502).send({ error: "archive_failed" });
+        }
         if (!ok)
             return reply.code(404).send({ error: "not_found" });
         return reply.send({ ok: true });

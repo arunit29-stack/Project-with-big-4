@@ -56,6 +56,17 @@ services:
       - postgres
       - redis
 
+  ai-worker:
+    build:
+      context: .
+      dockerfile: docker/ai-service.Dockerfile
+    command: ["celery", "-A", "app.worker.celery_app", "worker", "--loglevel=INFO", "-Q", "rag-ingestion"]
+    env_file:
+      - .env
+    depends_on:
+      - postgres
+      - redis
+
   media-server:
     build:
       context: .

@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+/* eslint-disable */
 const socket_io_client_1 = require("socket.io-client");
 const app_1 = require("./fastify/app");
 // Helper to make API calls

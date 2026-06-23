@@ -8,6 +8,7 @@ exports.unlockSubmission = unlockSubmission;
 exports.createSubmissionPresign = createSubmissionPresign;
 exports.confirmSubmission = confirmSubmission;
 exports.listTeacherAssignments = listTeacherAssignments;
+exports.attachSolutionsToAssignment = attachSolutionsToAssignment;
 const crypto_1 = require("crypto");
 const client_s3_1 = require("@aws-sdk/client-s3");
 const s3_request_presigner_1 = require("@aws-sdk/s3-request-presigner");
@@ -15,7 +16,7 @@ const postgres_1 = require("../db/postgres");
 const r2_1 = require("../library/r2");
 const service_1 = require("../notifications/service");
 function toAssignment(row) {
-    var _a;
+    var _a, _b, _c, _d, _e;
     const latePenaltyPercent = row.late_policy.type === "percentage_per_day"
         ? (_a = row.late_policy.deductionPercent) !== null && _a !== void 0 ? _a : 0
         : 100;
@@ -26,6 +27,12 @@ function toAssignment(row) {
         deadline: row.deadline_utc,
         rubric: row.rubric,
         latePenaltyPercent,
+        fileKey: (_b = row.file_key) !== null && _b !== void 0 ? _b : undefined,
+        fileName: (_c = row.file_name) !== null && _c !== void 0 ? _c : undefined,
+        fileUrl: row.file_key ? fileUrl(row.file_key) : undefined,
+        solutionKey: (_d = row.solution_key) !== null && _d !== void 0 ? _d : undefined,
+        solutionName: (_e = row.solution_name) !== null && _e !== void 0 ? _e : undefined,
+        solutionUrl: row.solution_key ? fileUrl(row.solution_key) : undefined,
     };
 }
 function fileUrl(fileKey) {
@@ -65,15 +72,15 @@ async function ensureStudentEnrollment(userId, courseId) {
     return Number((_b = (_a = result.rows[0]) === null || _a === void 0 ? void 0 : _a.count) !== null && _b !== void 0 ? _b : 0) > 0;
 }
 async function createAssignment(input) {
-    var _a;
+    var _a, _b, _c, _d, _e;
     if (!(await ensureTeacherOwnsCourse(input.teacherId, input.courseId))) {
         throw new Error("forbidden");
     }
     const id = (0, crypto_1.randomUUID)();
     await (0, postgres_1.getPostgresPool)().query(`
       INSERT INTO assignments (
-        id, course_id, title, description, deadline_utc, rubric, late_policy, created_by
-      ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
+        id, course_id, title, description, deadline_utc, rubric, late_policy, created_by, file_key, file_name
+      ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)
     `, [
         id,
         input.courseId,
@@ -83,6 +90,8 @@ async function createAssignment(input) {
         JSON.stringify(input.rubric),
         JSON.stringify(input.latePolicy),
         input.teacherId,
+        (_a = input.fileKey) !== null && _a !== void 0 ? _a : null,
+        (_b = input.fileName) !== null && _b !== void 0 ? _b : null,
     ]);
     return {
         id,
@@ -91,8 +100,11 @@ async function createAssignment(input) {
         deadline: input.deadlineUtc,
         rubric: input.rubric,
         latePenaltyPercent: input.latePolicy.type === "percentage_per_day"
-            ? (_a = input.latePolicy.deductionPercent) !== null && _a !== void 0 ? _a : 0
+            ? (_c = input.latePolicy.deductionPercent) !== null && _c !== void 0 ? _c : 0
             : 100,
+        fileKey: (_d = input.fileKey) !== null && _d !== void 0 ? _d : undefined,
+        fileName: (_e = input.fileName) !== null && _e !== void 0 ? _e : undefined,
+        fileUrl: input.fileKey ? fileUrl(input.fileKey) : undefined,
     };
 }
 async function listStudentAssignments(courseId, studentId) {
@@ -293,4 +305,16 @@ async function listTeacherAssignments(courseId, teacherId) {
         throw new Error("forbidden");
     const result = await (0, postgres_1.getPostgresPool)().query(`SELECT * FROM assignments WHERE course_id = $1 ORDER BY created_at DESC`, [courseId]);
     return result.rows.map(toAssignment);
+}
+async function attachSolutionsToAssignment(input) {
+    var _a;
+    if (!(await ensureTeacherOwnsCourse(input.teacherId, input.courseId))) {
+        throw new Error("forbidden");
+    }
+    const result = await (0, postgres_1.getPostgresPool)().query(`
+      UPDATE assignments
+      SET solution_key = $1, solution_name = $2
+      WHERE course_id = $3 AND id = $4
+    `, [input.solutionKey, input.solutionName, input.courseId, input.assignmentId]);
+    return ((_a = result.rowCount) !== null && _a !== void 0 ? _a : 0) > 0;
 }

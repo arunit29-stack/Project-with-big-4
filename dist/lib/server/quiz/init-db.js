@@ -66,4 +66,21 @@ async function initQuizDatabase() {
       ip_address VARCHAR(50)
     );
   `);
+    await pool.query(`
+    CREATE TABLE IF NOT EXISTS assignments (
+      id UUID PRIMARY KEY,
+      course_id VARCHAR(255) NOT NULL,
+      title VARCHAR(255) NOT NULL,
+      description TEXT NOT NULL,
+      deadline_utc TIMESTAMP NOT NULL,
+      rubric JSONB,
+      late_policy JSONB,
+      created_by VARCHAR(255) NOT NULL,
+      created_at TIMESTAMP DEFAULT NOW()
+    );
+    ALTER TABLE assignments ADD COLUMN IF NOT EXISTS file_key VARCHAR(255) DEFAULT NULL;
+    ALTER TABLE assignments ADD COLUMN IF NOT EXISTS file_name VARCHAR(255) DEFAULT NULL;
+    ALTER TABLE assignments ADD COLUMN IF NOT EXISTS solution_key VARCHAR(255) DEFAULT NULL;
+    ALTER TABLE assignments ADD COLUMN IF NOT EXISTS solution_name VARCHAR(255) DEFAULT NULL;
+  `);
 }

@@ -6,6 +6,7 @@ import {
   getNotificationSocketServer,
 } from "../../lib/server/notifications/ws";
 import { registerAuthRoutes } from "./auth-routes";
+import { registerAiRoutes } from "./ai-routes";
 import { registerLiveSessionRoutes } from "./live-session-routes";
 import { registerNotificationRoutes } from "./notifications-routes";
 import { registerLibraryRoutes } from "./library-routes";
@@ -36,6 +37,7 @@ export async function buildApp() {
   });
 
   await registerAuthRoutes(app);
+  await registerAiRoutes(app);
   await registerNotificationRoutes(app);
   await registerLibraryRoutes(app);
   await registerQuizRoutes(app);

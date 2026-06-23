@@ -13,6 +13,7 @@ RUN python -m pip install --upgrade pip && \
 COPY . .
 
 FROM base AS runner
+RUN apt-get update && apt-get install -y --no-install-recommends tesseract-ocr libgl1 libglib2.0-0 && rm -rf /var/lib/apt/lists/*
 RUN useradd --create-home --shell /usr/sbin/nologin ai
 WORKDIR /app
 COPY --from=builder /wheels /wheels

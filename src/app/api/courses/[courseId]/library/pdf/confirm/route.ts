@@ -25,12 +25,17 @@ export async function POST(
     return NextResponse.json({ error: "invalid" }, { status: 400 });
   }
 
-  const ok = await confirmPdfUpload({
-    courseId,
-    fileId: body.fileId,
-    week: body.week,
-    topic: body.topic,
-    fileName: body.fileName,
-  });
+  let ok = false;
+  try {
+    ok = await confirmPdfUpload({
+      courseId,
+      fileId: body.fileId,
+      week: body.week,
+      topic: body.topic,
+      fileName: body.fileName,
+    });
+  } catch {
+    return NextResponse.json({ error: "ingestion_queue_failed" }, { status: 502 });
+  }
   return NextResponse.json({ ok, indexQueued: ok });
 }

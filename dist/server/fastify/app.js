@@ -9,6 +9,7 @@ const fastify_1 = __importDefault(require("fastify"));
 const cron_1 = require("../../lib/server/notifications/cron");
 const ws_1 = require("../../lib/server/notifications/ws");
 const auth_routes_1 = require("./auth-routes");
+const ai_routes_1 = require("./ai-routes");
 const live_session_routes_1 = require("./live-session-routes");
 const notifications_routes_1 = require("./notifications-routes");
 const library_routes_1 = require("./library-routes");
@@ -30,6 +31,7 @@ async function buildApp() {
         global: false,
     });
     await (0, auth_routes_1.registerAuthRoutes)(app);
+    await (0, ai_routes_1.registerAiRoutes)(app);
     await (0, notifications_routes_1.registerNotificationRoutes)(app);
     await (0, library_routes_1.registerLibraryRoutes)(app);
     await (0, quiz_routes_1.registerQuizRoutes)(app);

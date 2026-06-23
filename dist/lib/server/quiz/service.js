@@ -7,6 +7,7 @@ exports.getOrCreateAttempt = getOrCreateAttempt;
 exports.saveAnswer = saveAnswer;
 exports.finishQuizScoring = finishQuizScoring;
 exports.voidQuestionAndRecalculate = voidQuestionAndRecalculate;
+/* eslint-disable */
 const crypto_1 = require("crypto");
 const postgres_1 = require("../db/postgres");
 const redis_state_1 = require("./redis-state");

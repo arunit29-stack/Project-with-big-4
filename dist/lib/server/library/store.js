@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.verifyStudentEnrollment = verifyStudentEnrollment;
 exports.createPdfDraft = createPdfDraft;
 exports.confirmPdfFile = confirmPdfFile;
+exports.markLibraryFileFailed = markLibraryFileFailed;
 exports.softDeleteLibraryFile = softDeleteLibraryFile;
 exports.listLibraryFiles = listLibraryFiles;
 exports.createTusSession = createTusSession;
@@ -37,7 +38,7 @@ async function confirmPdfFile(input) {
     var _a;
     const result = await (0, postgres_1.getPostgresPool)().query(`
       UPDATE course_library_files
-      SET status = 'ready',
+      SET status = 'processing',
           file_name = $4,
           week_number = $3,
           topic_name = $5,
@@ -48,6 +49,15 @@ async function confirmPdfFile(input) {
         AND type = 'pdf'
     `, [input.fileId, input.courseId, input.week, input.fileName, input.topic]);
     return ((_a = result.rowCount) !== null && _a !== void 0 ? _a : 0) > 0;
+}
+async function markLibraryFileFailed(input) {
+    await (0, postgres_1.getPostgresPool)().query(`
+      UPDATE course_library_files
+      SET status = 'failed',
+          ingestion_error = $3,
+          updated_at = NOW()
+      WHERE id = $1 AND course_id = $2
+    `, [input.fileId, input.courseId, input.error.slice(0, 4000)]);
 }
 async function softDeleteLibraryFile(courseId, fileId) {
     var _a;

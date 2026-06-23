@@ -11,6 +11,7 @@ const client_s3_1 = require("@aws-sdk/client-s3");
 const s3_request_presigner_1 = require("@aws-sdk/s3-request-presigner");
 const crypto_1 = require("crypto");
 const redis_1 = require("../auth/redis");
+const service_1 = require("../ai/service");
 const r2_1 = require("./r2");
 const store_1 = require("./store");
 const PDF_MAX_SIZE = 50 * 1024 * 1024;
@@ -43,13 +44,32 @@ async function presignPdfUpload(input) {
     return { uploadUrl, fileKey, fileId };
 }
 async function confirmPdfUpload(input) {
-    return (0, store_1.confirmPdfFile)(input);
+    const confirmed = await (0, store_1.confirmPdfFile)(input);
+    if (!confirmed) {
+        return false;
+    }
+    try {
+        await (0, service_1.queueRagIngestion)({
+            courseId: input.courseId,
+            fileId: input.fileId,
+        });
+    }
+    catch (error) {
+        await (0, store_1.markLibraryFileFailed)({
+            courseId: input.courseId,
+            fileId: input.fileId,
+            error: error instanceof Error ? error.message : "rag_ingestion_queue_failed",
+        });
+        throw error;
+    }
+    return true;
 }
 async function buildLibraryTree(courseId, role, userId) {
     if (role === "student" && !(await (0, store_1.verifyStudentEnrollment)(userId, courseId))) {
         throw new Error("forbidden");
     }
     const rows = await (0, store_1.listLibraryFiles)(courseId);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const weeks = new Map();
     for (const row of rows) {
         if (role === "student" && row.status !== "ready")
@@ -95,7 +115,11 @@ async function buildLibraryTree(courseId, role, userId) {
     });
 }
 async function deleteLibraryFile(courseId, fileId) {
-    return (0, store_1.softDeleteLibraryFile)(courseId, fileId);
+    const deleted = await (0, store_1.softDeleteLibraryFile)(courseId, fileId);
+    if (deleted) {
+        await (0, service_1.archiveRagFile)({ courseId, fileId });
+    }
+    return deleted;
 }
 async function createVideoTusSession(input) {
     const session = await (0, store_1.createTusSession)(input);

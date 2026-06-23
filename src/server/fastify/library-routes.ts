@@ -65,13 +65,19 @@ export async function registerLibraryRoutes(app: FastifyInstance) {
       ) {
         return reply.code(400).send({ error: "invalid" });
       }
-      const ok = await confirmPdfUpload({
-        courseId,
-        fileId: body.fileId,
-        week: body.week,
-        topic: body.topic,
-        fileName: body.fileName,
-      });
+      let ok = false;
+      try {
+        ok = await confirmPdfUpload({
+          courseId,
+          fileId: body.fileId,
+          week: body.week,
+          topic: body.topic,
+          fileName: body.fileName,
+        });
+      } catch (error) {
+        request.log.error({ error }, "pdf ingestion queue failed");
+        return reply.code(502).send({ error: "ingestion_queue_failed" });
+      }
       if (!ok) return reply.code(404).send({ error: "not_found" });
       return reply.send({ ok: true, indexQueued: true });
     },
@@ -99,7 +105,13 @@ export async function registerLibraryRoutes(app: FastifyInstance) {
     { preHandler: requireAuth(["teacher"]) },
     async (request, reply) => {
       const { courseId, fileId } = request.params as { courseId: string; fileId: string };
-      const ok = await deleteLibraryFile(courseId, fileId);
+      let ok = false;
+      try {
+        ok = await deleteLibraryFile(courseId, fileId);
+      } catch (error) {
+        request.log.error({ error }, "rag archive failed");
+        return reply.code(502).send({ error: "archive_failed" });
+      }
       if (!ok) return reply.code(404).send({ error: "not_found" });
       return reply.send({ ok: true });
     },
