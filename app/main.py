@@ -4,6 +4,8 @@ from fastapi import Depends, FastAPI, HTTPException
 
 from app.api.schemas import (
     ArchiveRequest,
+    AiQuizGenerationRequest,
+    AiQuizGenerationResponse,
     IngestRequest,
     InternalChatRequest,
     InternalChatResponse,
@@ -17,6 +19,7 @@ from app.core.security import require_internal_api_key
 from app.db.postgres import fetch_library_file, get_file_status, init_schema, list_ai_query_logs, mark_processing
 from app.ingestion.pipeline import archive_file, new_version_stamp
 from app.services.chat import answer_course_chat
+from app.services.quiz_generation import QuizGenerationError, generate_quiz_questions
 from app.worker import ingest_file_task
 
 
@@ -113,6 +116,27 @@ async def internal_chat(course_id: str, request: InternalChatRequest) -> Interna
         top_k=request.top_k,
     )
     return InternalChatResponse(**result)
+
+
+@app.post(
+    "/internal/courses/{course_id}/quizzes/ai-generate",
+    response_model=AiQuizGenerationResponse,
+    dependencies=[Depends(require_internal_api_key)],
+)
+async def internal_ai_quiz_generate(course_id: str, request: AiQuizGenerationRequest) -> AiQuizGenerationResponse:
+    if request.course_id != course_id:
+        raise HTTPException(status_code=400, detail="course_id_mismatch")
+    if not request.topic.strip():
+        raise HTTPException(status_code=400, detail="topic_required")
+    try:
+        questions = generate_quiz_questions(
+            course_id=course_id,
+            topic=request.topic,
+            question_count=request.question_count,
+        )
+    except QuizGenerationError as error:
+        raise HTTPException(status_code=422, detail=str(error)) from error
+    return AiQuizGenerationResponse(questions=questions)
 
 
 @app.get("/internal/courses/{course_id}/ai/query-logs", response_model=QueryLogsResponse, dependencies=[Depends(require_internal_api_key)])
