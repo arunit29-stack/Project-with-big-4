@@ -7,10 +7,10 @@ import type { Server } from "socket.io";
 import {
   saveChatMessage,
   getRoomMessages,
-} from "../server/group-rooms/chat";
-import { isRoomMember } from "../server/group-rooms/room";
-import { incrementMessagesSent } from "../server/group-rooms/contribution";
-import type { ChatMessageEvent } from "../../types/group-rooms";
+} from "./chat";
+import { isRoomMember } from "./room";
+import { incrementMessagesSent } from "./contribution";
+import type { ChatMessageEvent } from "../../../types/group-rooms";
 
 export function attachGroupRoomsChatServer(io: Server): void {
   // Namespace pattern: /group-rooms/:roomId/chat

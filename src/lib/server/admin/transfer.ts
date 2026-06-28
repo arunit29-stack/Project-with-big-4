@@ -4,7 +4,7 @@
  */
 import { randomUUID } from "crypto";
 import { getPostgresPool } from "../db/postgres";
-import type { CourseTransferResponse } from "../../types/admin";
+import type { CourseTransferResponse } from "../../../types/admin";
 
 /**
  * Transfer entire course to new teacher

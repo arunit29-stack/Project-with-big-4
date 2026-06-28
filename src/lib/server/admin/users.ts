@@ -9,7 +9,7 @@ import type {
   BulkEnrolResponse,
   CreateUserRequest,
   CreateUserResponse,
-} from "../../types/admin";
+} from "../../../types/admin";
 
 /**
  * Generate secure temporary password

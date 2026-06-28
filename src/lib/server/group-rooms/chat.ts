@@ -4,7 +4,7 @@
  */
 import { randomUUID } from "crypto";
 import { getPostgresPool } from "../db/postgres";
-import type { RoomChatMessage } from "../../types/group-rooms";
+import type { RoomChatMessage } from "../../../types/group-rooms";
 
 /**
  * Save a chat message

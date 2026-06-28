@@ -7,7 +7,7 @@ import type {
   PeerReviewConfig,
   ConfigurePeerReviewRequest,
   ReviewCriterion,
-} from "../../types/peer-review";
+} from "../../../types/peer-review";
 
 /**
  * Configure peer review for an assignment

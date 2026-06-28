@@ -6,7 +6,7 @@
 import { randomUUID } from "crypto";
 import { getPostgresPool } from "../db/postgres";
 import { getPeerReviewConfig } from "./config";
-import type { PeerReviewAssignment } from "../../types/peer-review";
+import type { PeerReviewAssignment } from "../../../types/peer-review";
 
 /**
  * Generate cryptographically secure review token

@@ -7,7 +7,7 @@ import { getPostgresPool } from "../db/postgres";
 import { getPeerReviewConfig, getAssignmentRubric } from "./config";
 import { getAssignmentByReviewToken } from "./assign";
 import { calculateZScoresForSubmission } from "./outlier";
-import type { PeerReviewScore, SubmitPeerReviewRequest } from "../../types/peer-review";
+import type { PeerReviewScore, SubmitPeerReviewRequest } from "../../../types/peer-review";
 
 /**
  * Submit a peer review

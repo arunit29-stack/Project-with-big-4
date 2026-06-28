@@ -3,7 +3,7 @@
  * CSV export of grades across all students and courses
  */
 import { getPostgresPool } from "../db/postgres";
-import type { GradesExportRecord } from "../../types/admin";
+import type { GradesExportRecord } from "../../../types/admin";
 
 /**
  * Export grades for institution as CSV

@@ -6,7 +6,7 @@
 import { randomUUID } from "crypto";
 import { getPostgresPool } from "../db/postgres";
 import { getPeerReviewConfig } from "./config";
-import type { OutlierDetection } from "../../types/peer-review";
+import type { OutlierDetection } from "../../../types/peer-review";
 
 /**
  * Calculate mean and standard deviation

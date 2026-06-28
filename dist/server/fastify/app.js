@@ -14,9 +14,14 @@ const live_session_routes_1 = require("./live-session-routes");
 const notifications_routes_1 = require("./notifications-routes");
 const library_routes_1 = require("./library-routes");
 const quiz_routes_1 = require("./quiz-routes");
+const group_rooms_routes_1 = require("./group-rooms-routes");
+const peer_review_routes_1 = require("./peer-review-routes");
+const admin_routes_1 = require("./admin-routes");
 const ws_2 = require("../../lib/server/live-session/ws");
 const ws_3 = require("../../lib/server/quiz/ws");
+const ws_4 = require("../../lib/server/group-rooms/ws");
 const init_db_1 = require("../../lib/server/quiz/init-db");
+const inactivity_cron_1 = require("../../lib/server/group-rooms/inactivity-cron");
 async function buildApp() {
     const app = (0, fastify_1.default)({
         logger: true,
@@ -35,14 +40,19 @@ async function buildApp() {
     await (0, notifications_routes_1.registerNotificationRoutes)(app);
     await (0, library_routes_1.registerLibraryRoutes)(app);
     await (0, quiz_routes_1.registerQuizRoutes)(app);
+    await (0, group_rooms_routes_1.registerGroupRoomsRoutes)(app);
+    await (0, peer_review_routes_1.registerPeerReviewRoutes)(app);
+    await (0, admin_routes_1.registerAdminRoutes)(app);
     await (0, ws_1.attachNotificationSocketServer)(app.server);
     const io = (0, ws_1.getNotificationSocketServer)();
     if (io) {
         (0, ws_2.attachLiveSessionSocketServer)(io);
         (0, ws_3.attachQuizSocketServer)(io);
+        (0, ws_4.attachGroupRoomsChatServer)(io);
     }
     await (0, live_session_routes_1.registerLiveSessionRoutes)(app);
     (0, cron_1.startNotificationCronJobs)();
+    (0, inactivity_cron_1.startInactivityDetectionCron)();
     app.get("/health", async () => ({ ok: true }));
     return app;
 }

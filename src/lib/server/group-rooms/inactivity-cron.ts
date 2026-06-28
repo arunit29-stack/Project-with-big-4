@@ -4,7 +4,7 @@
  */
 import { getPostgresPool } from "../db/postgres";
 import { hasRecentActivity } from "./contribution";
-import type { InactiveTask } from "../../types/group-rooms";
+import type { InactiveTask } from "../../../types/group-rooms";
 
 /**
  * Check for inactive students on 48+ hour old tasks
@@ -25,17 +25,24 @@ export async function detectInactiveStudents(): Promise<void> {
        ORDER BY t.room_id, t.assigned_to`
     );
 
-    const inactiveTasks: InactiveTask[] = tasksRes.rows;
+    const inactiveTasks: InactiveTask[] = tasksRes.rows.map((row: any) => ({
+      taskId: row.task_id,
+      roomId: row.room_id,
+      assignedTo: row.assigned_to,
+      taskTitle: row.title,
+      roomName: row.room_name,
+      updatedAt: row.updated_at || '',
+    }));
 
     // For each task, check if student has any activity in last 48 hours
     for (const task of inactiveTasks) {
-      const hasActivity = await hasRecentActivity(task.room_id, task.assigned_to, 48);
+      const hasActivity = await hasRecentActivity(task.roomId, task.assignedTo, 48);
 
       if (!hasActivity) {
         // Student has been inactive on this task for 48+ hours
         // Fire notification to teacher
         console.log(
-          `Inactivity detected: Student ${task.assigned_to} inactive on task "${task.title}" in room "${task.room_name}"`
+          `Inactivity detected: Student ${task.assignedTo} inactive on task "${task.taskTitle}" in room "${task.roomName}"`
         );
 
         // TODO: Call notification service

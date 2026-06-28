@@ -8,7 +8,7 @@ import type {
   GroupRoomWithSummary,
   CreateGroupRoomRequest,
   UpdateMembersRequest,
-} from "../../types/group-rooms";
+} from "../../../types/group-rooms";
 
 /**
  * Create a new group room
@@ -170,7 +170,7 @@ export async function isRoomMember(
     [roomId, studentId]
   );
 
-  return res.rowCount > 0;
+  return (res.rowCount ?? 0) > 0;
 }
 
 /**

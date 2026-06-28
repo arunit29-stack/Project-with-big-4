@@ -21,7 +21,7 @@ import {
   startQuiz,
 } from "../../lib/server/quiz/coordinator";
 import { getQuizState } from "../../lib/server/quiz/redis-state";
-import type { AiQuizGenerationRequest, AiGeneratedQuestion } from "../../types/quiz";
+import type { AiQuizGenerationRequest, AiGeneratedQuestion, AddQuestionRequest } from "../../types/quiz";
 
 function teacherOwnsCourse(courseId: string): boolean {
   return Boolean(getCourseDetail(courseId, "teacher") || getCourseDetail(courseId, "admin"));
@@ -332,7 +332,7 @@ export async function registerQuizRoutes(app: FastifyInstance): Promise<void> {
       const { quizId } = request.params as { quizId: string };
 
       try {
-        const questionId = await addQuestion(quizId, request.body as Record<string, unknown>);
+        const questionId = await addQuestion(quizId, request.body as AddQuestionRequest);
         return reply.send({ ok: true, questionId });
       } catch (err) {
         const message = (err as Error).message;
@@ -394,3 +394,5 @@ export async function registerQuizRoutes(app: FastifyInstance): Promise<void> {
       }
     }
   );
+}
+

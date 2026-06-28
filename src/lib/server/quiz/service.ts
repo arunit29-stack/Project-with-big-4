@@ -7,7 +7,7 @@ import type {
   EditQuestionRequest,
   AddQuestionRequest,
   VoidQuestionResponse,
-} from "../../types/quiz";
+} from "../../../types/quiz";
 
 export interface QuestionInput {
   type: "mcq" | "true_false" | "short_answer";

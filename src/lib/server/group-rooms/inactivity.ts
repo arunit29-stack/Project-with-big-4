@@ -3,7 +3,7 @@
  */
 import { randomUUID } from "crypto";
 import { getPostgresPool } from "../db/postgres";
-import type { InactivityReport } from "../../types/group-rooms";
+import type { InactivityReport } from "../../../types/group-rooms";
 
 /**
  * Create an inactivity report

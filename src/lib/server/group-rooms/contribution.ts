@@ -9,7 +9,7 @@ import type {
   StudentContributionBreakdown,
   DailyContribution,
   ContributionMetricsResponse,
-} from "../../types/group-rooms";
+} from "../../../types/group-rooms";
 
 /**
  * Increment message count for student in room today

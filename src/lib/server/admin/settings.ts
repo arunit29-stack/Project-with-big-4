@@ -7,7 +7,7 @@ import { getPostgresPool } from "../db/postgres";
 import type {
   InstitutionSettings,
   UpdateInstitutionSettingsRequest,
-} from "../../types/admin";
+} from "../../../types/admin";
 
 /**
  * Get institution settings

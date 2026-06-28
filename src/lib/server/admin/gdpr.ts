@@ -5,7 +5,7 @@
  */
 import { randomUUID } from "crypto";
 import { getPostgresPool } from "../db/postgres";
-import type { GDPRPurgeResponse } from "../../types/admin";
+import type { GDPRPurgeResponse } from "../../../types/admin";
 
 /**
  * Generate anonymous identifier

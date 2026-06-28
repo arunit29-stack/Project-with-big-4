@@ -10,7 +10,7 @@ import type {
   KanbanBoard,
   TaskStatus,
   TaskAuditLog,
-} from "../../types/group-rooms";
+} from "../../../types/group-rooms";
 
 /**
  * Create a task in a room

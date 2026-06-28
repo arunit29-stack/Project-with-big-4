@@ -10,7 +10,9 @@ import type {
   SubmissionReviewResults,
   ReviewSummaryPerCriterion,
   ReviewScoreDetail,
-} from "../../types/peer-review";
+  OutlierFlag,
+  AuditLogEntry,
+} from "../../../types/peer-review";
 
 /**
  * Override a specific outlier score
@@ -267,14 +269,22 @@ export async function calculateSubmissionResults(
 
   // Get outlier flags
   const outlierFlagsRes = await pool.query(
-    `SELECT review_token FROM peer_review_outlier_flags
+    `SELECT id, review_token, criterion, score, z_score, threshold, created_at, resolved_at, resolution_action FROM peer_review_outlier_flags
      WHERE assignment_id = $1 AND submission_id = $2 AND resolved_at IS NULL`,
     [assignmentId, submissionId]
   );
 
-  const outlierFlags = outlierFlagsRes.rows.map((row) => ({
+  const outlierFlags: OutlierFlag[] = outlierFlagsRes.rows.map((row) => ({
+    id: row.id,
     reviewToken: row.review_token,
     submissionId,
+    criterion: row.criterion,
+    score: parseFloat(row.score),
+    zScore: parseFloat(row.z_score),
+    threshold: parseFloat(row.threshold),
+    createdAt: row.created_at.toISOString(),
+    resolvedAt: row.resolved_at ? row.resolved_at.toISOString() : undefined,
+    resolutionAction: row.resolution_action as "overridden" | "discarded" | undefined,
   }));
 
   // Get audit trail
@@ -285,8 +295,10 @@ export async function calculateSubmissionResults(
     [assignmentId, submissionId]
   );
 
-  const auditTrail = auditRes.rows.map((row) => ({
+  const auditTrail: AuditLogEntry[] = auditRes.rows.map((row) => ({
     id: randomUUID(),
+    assignmentId,
+    submissionId,
     action: row.action,
     reviewToken: row.review_token,
     details: typeof row.details === "string" ? JSON.parse(row.details) : row.details,
