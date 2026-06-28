@@ -1,7 +1,7 @@
 from celery import Celery
 
-from app.core.config import get_settings
-from app.ingestion.pipeline import ingest_file
+from backend.core.config import get_settings
+from backend.ingestion.pipeline import ingest_file
 
 settings = get_settings()
 

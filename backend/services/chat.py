@@ -2,15 +2,15 @@ from typing import Any
 
 from anthropic import Anthropic
 
-from app.api.schemas import ChatMessage
-from app.core.config import get_settings
-from app.db.postgres import (
+from backend.api.schemas import ChatMessage
+from backend.core.config import get_settings
+from backend.db.postgres import (
     get_course_name,
     insert_ai_query_log,
     is_assignment_lock_mode_active,
 )
-from app.ingestion.embeddings import get_embedding_provider
-from app.services.vector_store import get_vector_store
+from backend.ingestion.embeddings import get_embedding_provider
+from backend.services.vector_store import get_vector_store
 
 GROUNDING_REFUSAL = "This topic is not covered in the course material. Please check with your teacher."
 LOCK_MODE_APPENDIX = (

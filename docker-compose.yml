@@ -60,7 +60,7 @@ services:
     build:
       context: .
       dockerfile: docker/ai-service.Dockerfile
-    command: ["celery", "-A", "app.worker.celery_app", "worker", "--loglevel=INFO", "-Q", "rag-ingestion"]
+    command: ["celery", "-A", "backend.worker.celery_app", "worker", "--loglevel=INFO", "-Q", "rag-ingestion"]
     env_file:
       - .env
     depends_on:

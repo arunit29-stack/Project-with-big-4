@@ -4,10 +4,10 @@ from typing import Any
 from anthropic import Anthropic
 from pydantic import ValidationError
 
-from app.api.schemas import AiGeneratedQuestion
-from app.core.config import get_settings
-from app.ingestion.embeddings import get_embedding_provider
-from app.services.vector_store import get_vector_store
+from backend.api.schemas import AiGeneratedQuestion
+from backend.core.config import get_settings
+from backend.ingestion.embeddings import get_embedding_provider
+from backend.services.vector_store import get_vector_store
 
 QUIZ_MODEL = "claude-sonnet-4-20250514"
 QUIZ_CONTEXT_TOP_K = 15

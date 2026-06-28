@@ -5,8 +5,8 @@ from typing import Any
 import redis
 from psycopg.types.json import Jsonb
 
-from app.core.config import get_settings
-from app.db.postgres import get_conn
+from backend.core.config import get_settings
+from backend.db.postgres import get_conn
 
 logger = logging.getLogger(__name__)
 

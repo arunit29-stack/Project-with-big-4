@@ -1,6 +1,6 @@
 from fastapi import Header, HTTPException, status
 
-from app.core.config import get_settings
+from backend.core.config import get_settings
 
 
 def require_internal_api_key(x_internal_api_key: str | None = Header(default=None)) -> None:

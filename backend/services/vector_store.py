@@ -2,8 +2,8 @@ import json
 from abc import ABC, abstractmethod
 from typing import Any
 
-from app.core.config import get_settings
-from app.db.postgres import get_conn
+from backend.core.config import get_settings
+from backend.db.postgres import get_conn
 
 
 class VectorStore(ABC):

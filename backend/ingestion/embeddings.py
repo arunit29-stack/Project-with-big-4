@@ -5,7 +5,7 @@ from typing import Protocol
 
 from langchain_openai import OpenAIEmbeddings
 
-from app.core.config import get_settings
+from backend.core.config import get_settings
 
 
 class EmbeddingProvider(Protocol):

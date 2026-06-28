@@ -3,8 +3,8 @@ import mimetypes
 from pathlib import Path
 from uuid import uuid4
 
-from app.core.config import get_settings
-from app.db.postgres import (
+from backend.core.config import get_settings
+from backend.db.postgres import (
     archive_chunk_rows,
     fetch_library_file,
     list_active_vector_ids,
@@ -13,12 +13,12 @@ from app.db.postgres import (
     mark_ready,
     record_chunks,
 )
-from app.ingestion.chunking import build_chunks
-from app.ingestion.embeddings import get_embedding_provider
-from app.ingestion.extractors import extract_text
-from app.services.notifications import notify_ingestion_failed
-from app.services.storage import download_to_tempfile, head_object
-from app.services.vector_store import get_vector_store
+from backend.ingestion.chunking import build_chunks
+from backend.ingestion.embeddings import get_embedding_provider
+from backend.ingestion.extractors import extract_text
+from backend.services.notifications import notify_ingestion_failed
+from backend.services.storage import download_to_tempfile, head_object
+from backend.services.vector_store import get_vector_store
 
 logger = logging.getLogger(__name__)
 

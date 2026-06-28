@@ -2,7 +2,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import Depends, FastAPI, HTTPException
 
-from app.api.schemas import (
+from backend.api.schemas import (
     ArchiveRequest,
     AiQuizGenerationRequest,
     AiQuizGenerationResponse,
@@ -15,12 +15,12 @@ from app.api.schemas import (
     StatusResponse,
     TaskResponse,
 )
-from app.core.security import require_internal_api_key
-from app.db.postgres import fetch_library_file, get_file_status, init_schema, list_ai_query_logs, mark_processing
-from app.ingestion.pipeline import archive_file, new_version_stamp
-from app.services.chat import answer_course_chat
-from app.services.quiz_generation import QuizGenerationError, generate_quiz_questions
-from app.worker import ingest_file_task
+from backend.core.security import require_internal_api_key
+from backend.db.postgres import fetch_library_file, get_file_status, init_schema, list_ai_query_logs, mark_processing
+from backend.ingestion.pipeline import archive_file, new_version_stamp
+from backend.services.chat import answer_course_chat
+from backend.services.quiz_generation import QuizGenerationError, generate_quiz_questions
+from backend.worker import ingest_file_task
 
 
 @asynccontextmanager

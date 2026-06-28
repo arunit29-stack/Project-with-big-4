@@ -4,7 +4,7 @@ from pathlib import Path
 
 import boto3
 
-from app.core.config import get_settings
+from backend.core.config import get_settings
 
 
 @dataclass(frozen=True)

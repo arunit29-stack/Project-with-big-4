@@ -5,7 +5,7 @@ from psycopg.rows import dict_row
 from psycopg.types.json import Jsonb
 from psycopg_pool import ConnectionPool
 
-from app.core.config import get_settings
+from backend.core.config import get_settings
 
 _pool: ConnectionPool | None = None
 

@@ -3,7 +3,7 @@ from typing import Any
 
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
-from app.ingestion.extractors import ExtractedSection
+from backend.ingestion.extractors import ExtractedSection
 
 
 @dataclass(frozen=True)
