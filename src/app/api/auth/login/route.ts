@@ -1,31 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import type { LoginResponse, UserRole } from "@/types/auth";
 import { issueLoginToken } from "@/lib/server/auth/next";
-
-/** Dev mock users — replace with real auth service integration. */
-const MOCK_USERS: Record<
-  string,
-  { password: string; id: string; role: UserRole; institutionId: string }
-> = {
-  "student@cbb.edu": {
-    password: "password",
-    id: "u-student-1",
-    role: "student",
-    institutionId: "inst-demo",
-  },
-  "teacher@cbb.edu": {
-    password: "password",
-    id: "u-teacher-1",
-    role: "teacher",
-    institutionId: "inst-demo",
-  },
-  "admin@cbb.edu": {
-    password: "password",
-    id: "u-admin-1",
-    role: "admin",
-    institutionId: "inst-demo",
-  },
-};
+import { getPostgresPool } from "@/lib/server/db/postgres";
+import bcrypt from "bcrypt";
 
 export async function POST(request: NextRequest) {
   let email: string;
@@ -39,26 +16,45 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "invalid" }, { status: 401 });
   }
 
-  const account = MOCK_USERS[email];
-  if (!account || account.password !== password) {
-    return NextResponse.json({ error: "invalid" }, { status: 401 });
+  const pool = getPostgresPool();
+
+  try {
+    const res = await pool.query(
+      `SELECT id, password_hash, role, institution_id FROM users WHERE email = $1`,
+      [email]
+    );
+
+    if (res.rows.length === 0) {
+      return NextResponse.json({ error: "invalid" }, { status: 401 });
+    }
+
+    const account = res.rows[0];
+
+    const passwordMatch = await bcrypt.compare(password, account.password_hash);
+    
+    if (!passwordMatch) {
+      return NextResponse.json({ error: "invalid" }, { status: 401 });
+    }
+
+    const response: LoginResponse = {
+      token: await issueLoginToken({
+        userId: account.id,
+        email,
+        role: account.role as UserRole,
+        institutionId: account.institution_id,
+      }),
+      role: account.role as UserRole,
+      user: {
+        id: account.id,
+        role: account.role as UserRole,
+        email,
+        institutionId: account.institution_id,
+      },
+    };
+
+    return NextResponse.json(response);
+  } catch (error) {
+    console.error("Login error:", error);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
-
-  const response: LoginResponse = {
-    token: await issueLoginToken({
-      userId: account.id,
-      email,
-      role: account.role,
-      institutionId: account.institutionId,
-    }),
-    role: account.role,
-    user: {
-      id: account.id,
-      role: account.role,
-      email,
-      institutionId: account.institutionId,
-    },
-  };
-
-  return NextResponse.json(response);
 }

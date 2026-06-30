@@ -4,6 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useServerConfig } from "@/hooks/useServerConfig";
 import { homeRouteForRole } from "@/lib/auth/redirects";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { FormEvent, useEffect, useState } from "react";
 
 export function LoginForm() {
@@ -102,6 +103,13 @@ export function LoginForm() {
           Sign in with {institutionLabel} SSO
         </button>
       )}
+
+      <div className="mt-6 text-center text-sm text-slate-600">
+        Don't have an account?{" "}
+        <Link href="/signup" className="font-medium text-brand-600 hover:text-brand-500">
+          Sign Up
+        </Link>
+      </div>
     </div>
   );
 }
