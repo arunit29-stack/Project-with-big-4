@@ -53,12 +53,14 @@ export function CourseTabPanel({ tab, courseId, role }: CourseTabPanelProps) {
       return (
         <EmptyState
           illustration={<ClipboardIllustration />}
-          title={t("courseShell.empty.assignmentsTitle")}
-          description={t("courseShell.empty.assignmentsDescription")}
+          title={role === "student" ? t("courseShell.empty.assignmentsStudentTitle") : t("courseShell.empty.assignmentsTitle")}
+          description={role === "student" ? t("courseShell.empty.assignmentsStudentDescription") : t("courseShell.empty.assignmentsDescription")}
           cta={
-            <span className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white opacity-60">
-              {t("courseShell.empty.assignmentsCta")}
-            </span>
+            role === "student" ? undefined : (
+              <span className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white opacity-60">
+                {t("courseShell.empty.assignmentsCta")}
+              </span>
+            )
           }
         />
       );
@@ -69,12 +71,14 @@ export function CourseTabPanel({ tab, courseId, role }: CourseTabPanelProps) {
       return (
         <EmptyState
           illustration={<QuizIllustration />}
-          title={t("courseShell.empty.quizzesTitle")}
-          description={t("courseShell.empty.quizzesDescription")}
+          title={role === "student" ? t("courseShell.empty.quizzesStudentTitle") : t("courseShell.empty.quizzesTitle")}
+          description={role === "student" ? t("courseShell.empty.quizzesStudentDescription") : t("courseShell.empty.quizzesDescription")}
           cta={
-            <span className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white opacity-60">
-              {t("courseShell.empty.quizzesCta")}
-            </span>
+            role === "student" ? undefined : (
+              <span className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white opacity-60">
+                {t("courseShell.empty.quizzesCta")}
+              </span>
+            )
           }
         />
       );
@@ -85,12 +89,14 @@ export function CourseTabPanel({ tab, courseId, role }: CourseTabPanelProps) {
       return (
         <EmptyState
           illustration={<ChalkboardIllustration />}
-          title={t("courseShell.empty.liveTitle")}
-          description={t("courseShell.empty.liveDescription")}
+          title={role === "student" ? t("courseShell.empty.liveStudentTitle") : t("courseShell.empty.liveTitle")}
+          description={role === "student" ? t("courseShell.empty.liveStudentDescription") : t("courseShell.empty.liveDescription")}
           cta={
-            <span className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white opacity-60">
-              {t("courseShell.empty.liveCta")}
-            </span>
+            role === "student" ? undefined : (
+              <span className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white opacity-60">
+                {t("courseShell.empty.liveCta")}
+              </span>
+            )
           }
         />
       );
@@ -98,12 +104,14 @@ export function CourseTabPanel({ tab, courseId, role }: CourseTabPanelProps) {
       return (
         <EmptyState
           illustration={<GroupsIllustration />}
-          title={t("courseShell.empty.groupsTitle")}
-          description={t("courseShell.empty.groupsDescription")}
+          title={role === "student" ? t("courseShell.empty.groupsStudentTitle") : t("courseShell.empty.groupsTitle")}
+          description={role === "student" ? t("courseShell.empty.groupsStudentDescription") : t("courseShell.empty.groupsDescription")}
           cta={
-            <span className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white opacity-60">
-              {t("courseShell.empty.groupsCta")}
-            </span>
+            role === "student" ? undefined : (
+              <span className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white opacity-60">
+                {t("courseShell.empty.groupsCta")}
+              </span>
+            )
           }
         />
       );

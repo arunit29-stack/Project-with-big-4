@@ -44,16 +44,46 @@ export function getRedisClient(): Promise<RedisLikeClient | null> {
         return null;
       }
 
-      const client = redisModule.createClient({ url });
-      client.on("error", (error: Error) => {
-        console.error("[redis] client error", error);
+      const client = redisModule.createClient({
+        url,
+        socket: {
+          reconnectStrategy: (retries) => {
+            if (retries > 2) {
+              // Stop retrying and return an error to reject the connection promise
+              return new Error("Redis connection failed after 2 retries");
+            }
+            return 500; // Retry after 500ms
+          },
+          connectTimeout: 2000, // 2s timeout
+        } as any,
+      });
+
+      let connectionWarningLogged = false;
+      client.on("error", (error: any) => {
+        const code = error?.code || error?.errno;
+        if (code === "ECONNREFUSED" || code === "ENOTFOUND" || error?.message?.includes("ECONNREFUSED")) {
+          if (!connectionWarningLogged) {
+            console.warn("[redis] Redis server is unreachable. Running in local/offline auth mode.");
+            connectionWarningLogged = true;
+          }
+          return;
+        }
+        console.error("[redis] client error:", error?.message || error);
       });
 
       try {
         await client.connect();
         return client;
-      } catch (error) {
-        console.error("[redis] connect failed", error);
+      } catch (error: any) {
+        const code = error?.code || error?.errno;
+        if (code !== "ECONNREFUSED" && code !== "ENOTFOUND" && !error?.message?.includes("ECONNREFUSED")) {
+          console.error("[redis] connect failed:", error instanceof Error ? error.message : error);
+        }
+        try {
+          await client.disconnect();
+        } catch {
+          // ignore
+        }
         return null;
       }
     })();

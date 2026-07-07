@@ -52,7 +52,7 @@ export function ContentLibrary({ courseId, role }: ContentLibraryProps) {
       <EmptyState
         illustration={<ChalkboardIllustration />}
         title={t("courseShell.empty.contentTitle")}
-        description={t("courseShell.empty.contentDescription")}
+        description={isTeacher ? t("courseShell.empty.contentDescription") : t("courseShell.empty.contentStudentDescription")}
       />
     );
   }

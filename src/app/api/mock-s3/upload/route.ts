@@ -3,8 +3,6 @@ import { requireNextAuth } from "@/lib/server/auth/next";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function PUT(request: NextRequest) {
-  const auth = await requireNextAuth(request, ["student", "teacher", "admin"]);
-  if (auth instanceof Response) return auth;
 
   const token = request.nextUrl.searchParams.get("token");
   if (!token) {

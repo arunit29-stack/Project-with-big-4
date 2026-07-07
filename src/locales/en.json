@@ -66,19 +66,28 @@
     "empty": {
       "contentTitle": "No content yet",
       "contentDescription": "Upload materials to build your content library.",
+      "contentStudentDescription": "Your teacher hasn't uploaded any study materials for this course yet.",
       "contentCta": "Add content",
       "assignmentsTitle": "No assignments posted",
       "assignmentsDescription": "Create an assignment for your students.",
       "assignmentsCta": "Create assignment",
+      "assignmentsStudentTitle": "No assignments yet",
+      "assignmentsStudentDescription": "Your teacher hasn't posted any assignments for this course yet.",
       "quizzesTitle": "No quizzes yet",
       "quizzesDescription": "Add a quiz to assess student learning.",
       "quizzesCta": "Create quiz",
+      "quizzesStudentTitle": "No quizzes yet",
+      "quizzesStudentDescription": "Your teacher hasn't scheduled any quizzes for this course yet.",
       "liveTitle": "No live session",
       "liveDescription": "Start a live session when you're ready to teach.",
       "liveCta": "Schedule session",
+      "liveStudentTitle": "No active live session",
+      "liveStudentDescription": "There is no live lecture active right now. Your teacher will start one when class begins.",
       "groupsTitle": "No group rooms",
       "groupsDescription": "Set up collaborative group spaces for students.",
-      "groupsCta": "Create room"
+      "groupsCta": "Create room",
+      "groupsStudentTitle": "No group rooms yet",
+      "groupsStudentDescription": "Your teacher hasn't created any group rooms for this class yet."
     }
   },
   "contentLibrary": {
