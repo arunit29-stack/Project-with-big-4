@@ -56,8 +56,8 @@ export function SignupForm() {
   }
 
   return (
-    <div className="w-full max-w-md rounded-xl border border-slate-200 bg-white p-8 shadow-sm">
-      <h1 className="mb-6 text-center text-2xl font-semibold text-slate-900">
+    <>
+      <h1 className="mb-6 text-center text-2xl font-bold tracking-tight text-slate-900">
         Create an Account
       </h1>
 
@@ -65,7 +65,7 @@ export function SignupForm() {
         <div>
           <label
             htmlFor="name"
-            className="mb-1 block text-sm font-medium text-slate-700"
+            className="mb-1 block text-sm font-bold text-slate-700"
           >
             Full Name
           </label>
@@ -75,14 +75,14 @@ export function SignupForm() {
             required
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 outline-none ring-brand-500 focus:border-brand-500 focus:ring-2"
+            className="w-full rounded-xl border border-white/50 bg-white/40 px-4 py-2.5 text-slate-900 outline-none transition focus:border-blue-500 focus:bg-white/80 focus:ring-4 focus:ring-blue-500/10 backdrop-blur-sm shadow-inner"
           />
         </div>
 
         <div>
           <label
             htmlFor="email"
-            className="mb-1 block text-sm font-medium text-slate-700"
+            className="mb-1 block text-sm font-bold text-slate-700"
           >
             Email
           </label>
@@ -93,14 +93,14 @@ export function SignupForm() {
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 outline-none ring-brand-500 focus:border-brand-500 focus:ring-2"
+            className="w-full rounded-xl border border-white/50 bg-white/40 px-4 py-2.5 text-slate-900 outline-none transition focus:border-blue-500 focus:bg-white/80 focus:ring-4 focus:ring-blue-500/10 backdrop-blur-sm shadow-inner"
           />
         </div>
 
         <div>
           <label
             htmlFor="password"
-            className="mb-1 block text-sm font-medium text-slate-700"
+            className="mb-1 block text-sm font-bold text-slate-700"
           >
             Password
           </label>
@@ -111,14 +111,14 @@ export function SignupForm() {
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 outline-none ring-brand-500 focus:border-brand-500 focus:ring-2"
+            className="w-full rounded-xl border border-white/50 bg-white/40 px-4 py-2.5 text-slate-900 outline-none transition focus:border-blue-500 focus:bg-white/80 focus:ring-4 focus:ring-blue-500/10 backdrop-blur-sm shadow-inner"
           />
         </div>
 
         <div>
           <label
             htmlFor="role"
-            className="mb-1 block text-sm font-medium text-slate-700"
+            className="mb-1 block text-sm font-bold text-slate-700"
           >
             I am a...
           </label>
@@ -126,7 +126,7 @@ export function SignupForm() {
             id="role"
             value={role}
             onChange={(e) => setRole(e.target.value as UserRole)}
-            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 outline-none ring-brand-500 focus:border-brand-500 focus:ring-2 bg-white"
+            className="w-full rounded-xl border border-white/50 bg-white/40 px-4 py-2.5 text-slate-900 outline-none transition focus:border-blue-500 focus:bg-white/80 focus:ring-4 focus:ring-blue-500/10 backdrop-blur-sm shadow-inner bg-transparent"
           >
             <option value="student">Student</option>
             <option value="teacher">Teacher</option>
@@ -136,7 +136,7 @@ export function SignupForm() {
         {errorMsg && (
           <p
             role="alert"
-            className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700"
+            className="rounded-xl bg-red-50 px-4 py-2.5 text-sm text-red-700 font-medium"
           >
             {errorMsg}
           </p>
@@ -145,18 +145,11 @@ export function SignupForm() {
         <button
           type="submit"
           disabled={submitting || status === "loading"}
-          className="w-full rounded-lg bg-brand-600 px-4 py-2.5 font-medium text-white transition hover:bg-brand-700 disabled:cursor-not-allowed disabled:opacity-60"
+          className="w-full rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-4 py-3 font-semibold text-white transition-all duration-200 hover:from-blue-700 hover:to-indigo-700 shadow-md shadow-blue-500/15 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {submitting || status === "loading" ? "Signing up…" : "Sign Up"}
         </button>
       </form>
-      
-      <div className="mt-6 text-center text-sm text-slate-600">
-        Already have an account?{" "}
-        <Link href="/login" className="font-medium text-brand-600 hover:text-brand-500">
-          Sign In
-        </Link>
-      </div>
-    </div>
+    </>
   );
 }

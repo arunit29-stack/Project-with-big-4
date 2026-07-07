@@ -51,8 +51,8 @@ export function StudentAssignmentList({
     return (
       <EmptyState
         illustration={<ClipboardIllustration />}
-        title={t("courseShell.empty.assignmentsTitle")}
-        description={t("courseShell.empty.assignmentsDescription")}
+        title={t("courseShell.empty.assignmentsStudentTitle")}
+        description={t("courseShell.empty.assignmentsStudentDescription")}
       />
     );
   }

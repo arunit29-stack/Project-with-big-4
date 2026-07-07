@@ -729,13 +729,15 @@ export function LiveQuiz({ courseId, role }: LiveQuizProps) {
                   </p>
                   <h3 className="text-2xl font-black text-slate-950">Leaderboard</h3>
                 </div>
-                <button
-                  type="button"
-                  onClick={nextQuestion}
-                  className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-700"
-                >
-                  {questionIndex + 1 >= QUESTIONS.length ? "Finish Quiz" : "Next Question"}
-                </button>
+                {isTeacher && (
+                  <button
+                    type="button"
+                    onClick={nextQuestion}
+                    className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-700"
+                  >
+                    {questionIndex + 1 >= QUESTIONS.length ? "Finish Quiz" : "Next Question"}
+                  </button>
+                )}
               </div>
 
               {!isTeacher && myRow && (

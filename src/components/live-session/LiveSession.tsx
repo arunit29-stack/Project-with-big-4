@@ -646,13 +646,15 @@ export function LiveSession({ courseId, role }: LiveSessionProps) {
                 Recording active
               </span>
             ) : (
-              <button
-                type="button"
-                onClick={forceRecordingStarted}
-                className="rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
-              >
-                Simulate rec:started
-              </button>
+              isTeacher && (
+                <button
+                  type="button"
+                  onClick={forceRecordingStarted}
+                  className="rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+                >
+                  Simulate rec:started
+                </button>
+              )
             )}
             {isTeacher && !callActive && (
               <button

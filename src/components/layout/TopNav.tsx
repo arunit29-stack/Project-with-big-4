@@ -50,7 +50,6 @@ export function TopNav() {
         </div>
 
         <div className="flex items-center gap-4">
-          <UnassessedNavBadge />
           <NotificationBell />
           {user && (
             <div className="flex items-center gap-3">

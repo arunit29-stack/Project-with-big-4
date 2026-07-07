@@ -23,6 +23,13 @@ export async function POST(
   }
 
   const fileKey = `assignments/${courseId}/teacher/${randomUUID()}-${fileName}`;
+  
+  if (!process.env.R2_ACCOUNT_ID || !process.env.R2_ACCESS_KEY_ID || !process.env.R2_SECRET_ACCESS_KEY) {
+    const token = `upload-${Date.now()}`;
+    const uploadUrl = `/api/mock-s3/upload?token=${token}&key=${encodeURIComponent(fileKey)}`;
+    return NextResponse.json({ uploadUrl, fileKey, fileName });
+  }
+
   const uploadUrl = await getSignedUrl(
     getR2Client(),
     new PutObjectCommand({
